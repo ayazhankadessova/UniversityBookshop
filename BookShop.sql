@@ -2,7 +2,7 @@ PROMPT DROP TABLES;
 
 DROP TABLE Book CASCADE CONSTRAINT;
 DROP TABLE Student CASCADE CONSTRAINT;
-DROP TABLE OrdersNew CASCADE CONSTRAINT;
+DROP TABLE Orders CASCADE CONSTRAINT;
 
 CREATE TABLE Book (
     book_id INT,
@@ -23,7 +23,7 @@ CREATE TABLE Student (
     PRIMARY KEY (student_id)
 );
 
-CREATE TABLE OrdersNew (
+CREATE TABLE Orders (
     order_id INT,
     student_id INT NOT NULL,
     order_date DATE NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE Orders_Book (
     book_amount INT,
     delivery_date DATE NOT NULL,
     PRIMARY KEY (order_id, book_id),
-    FOREIGN KEY (order_id) REFERENCES OrdersNew(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES Book(book_id)
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE Orders_Book (
 
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
-FOREIGN KEY (order_id) REFERENCES OrdersNew(order_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED NULL;
+FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
 
 COMMIT;
 
@@ -68,12 +68,12 @@ INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 75, 0.10);
 INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 100, 0.15);
 INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 25, 0.02);
 
--- Insert into OrdersNew table
-PROMPT INSERT OrdersNew TABLE;
-INSERT INTO OrdersNew VALUES (1, 1, '2023-03-29', 40.00, 'Credit Card', '1234567890123456');
-INSERT INTO OrdersNew VALUES (2, 3, '2023-03-30', 30.00, 'Debit Card', '6543210987654321');
-INSERT INTO OrdersNew VALUES (3, 2, '2023-03-30', 50.00, 'Credit Card', '9876543210123456');
-INSERT INTO OrdersNew VALUES (4, 4, '2023-03-31', 20.00, 'PayPal', NULL);
+-- Insert into Orders table
+PROMPT INSERT Orders TABLE;
+INSERT INTO Orders VALUES (1, 1, '2023-03-29', 40.00, 'Credit Card', '1234567890123456');
+INSERT INTO Orders VALUES (2, 3, '2023-03-30', 30.00, 'Debit Card', '6543210987654321');
+INSERT INTO Orders VALUES (3, 2, '2023-03-30', 50.00, 'Credit Card', '9876543210123456');
+INSERT INTO Orders VALUES (4, 4, '2023-03-31', 20.00, 'PayPal', NULL);
 
 
 -- Insert into Orders_Book table
