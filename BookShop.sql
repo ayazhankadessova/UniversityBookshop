@@ -85,6 +85,21 @@ INSERT INTO Orders_Book VALUES (3, 4, 2, '2023-03-03');
 INSERT INTO Orders_Book VALUES (4, 1, 1, '2023-03-01');
 INSERT INTO Orders_Book VALUES (4, 2, 1, '2023-03-01');
 
+
+CREATE TRIGGER check_book_amount
+BEFORE INSERT ON Orders_Book
+FOR EACH ROW
+BEGIN
+  -- Check if there is enough amount of the book in the Book table
+  IF NEW.book_amount > (SELECT amount FROM Book WHERE book_id = NEW.book_id) THEN
+    -- Raise an error if there is not enough amount of the book
+    RAISE_APPLICATION_ERROR(-20001, 'Not enough books');
+  END IF;
+END;
+
+
+
+
 -- COMMIT;
 
 -- SET AUTOCOMMIT ON
