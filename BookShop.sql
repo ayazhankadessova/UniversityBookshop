@@ -86,19 +86,126 @@ INSERT INTO Orders_Book VALUES (4, 1, 1, '2023-03-01');
 INSERT INTO Orders_Book VALUES (4, 2, 1, '2023-03-01');
 
 
-CREATE TRIGGER check_book_amount
+-- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
+CREATE OR REPLACE TRIGGER check_book_amount
 BEFORE INSERT ON Orders_Book
 FOR EACH ROW
+DECLARE
+  book_amount NUMBER;
 BEGIN
   -- Check if there is enough amount of the book in the Book table
-  IF NEW.book_amount > (SELECT amount FROM Book WHERE book_id = NEW.book_id) THEN
+  SELECT amount INTO book_amount FROM Book WHERE book_id = :NEW.book_id;
+  IF :NEW.book_amount > book_amount THEN
     -- Raise an error if there is not enough amount of the book
     RAISE_APPLICATION_ERROR(-20001, 'Not enough books');
   END IF;
 END;
+/
+
+-- Create a trigger to update the total price of the order in the Orders table after we Insert a new row into the Orders_Book table
+CREATE OR REPLACE TRIGGER update_total_price_and_amount
+AFTER INSERT ON Orders_Book
+FOR EACH ROW
+BEGIN
+    UPDATE Orders
+    SET total_price = (SELECT SUM(Book.price * Orders_Book.book_amount)
+                       FROM Book
+                       JOIN Orders_Book ON Book.book_id = Orders_Book.book_id
+                       WHERE Orders_Book.order_id = :NEW.order_id)
+    WHERE order_id = :NEW.order_id;
+    
+    UPDATE Book
+    SET amount = amount - :NEW.book_amount
+    WHERE book_id = :NEW.book_id;
+END;
+/
+
+-- Create a trigger to check if the credit card number is valid
+CREATE TRIGGER check_credit_card
+BEFORE INSERT ON Orders
+FOR EACH ROW
+BEGIN
+  IF NEW.payment_method = 'Credit Card' AND (NEW.card_no IS NULL OR length(NEW.card_no) != 16) THEN
+    -- Raise an error if the card number is not valid
+    SELECT RAISE(ABORT, 'Invalid credit card number');
+  END IF;
+END;
+/
 
 
+-- Create a trigger to check if we can cancel order
+BEFORE DELETE ON Orders
+FOR EACH ROW
+DECLARE
+    order_age NUMBER;
+    book_delivered NUMBER;
+BEGIN
+    -- Check order age
+    SELECT SYSDATE - order_date INTO order_age
+    FROM OrdersNew
+    WHERE order_id = :OLD.order_id;
 
+    IF order_age > 7 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
+    END IF;
+    
+    -- Check if any book has been delivered
+    SELECT COUNT(*) INTO book_delivered
+    FROM Orders_Book
+    WHERE order_id = :OLD.order_id AND delivery_date IS NOT NULL;
+
+    IF book_delivered > 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Cannot cancel order: some books have already been delivered');
+    END IF;
+END;
+/
+
+-- Create a trigger to update the total price of the order in the Orders table after we Delete a row from the Orders_Book table
+-- and update the amount of the book in the Book table
+-- and update the discount of the student in the Student table
+CREATE OR REPLACE TRIGGER update_book_amount_cancel_order
+AFTER DELETE ON Orders
+FOR EACH ROW
+BEGIN
+   UPDATE Book
+   SET amount = amount + (
+       SELECT book_amount
+       FROM Order_Book
+       WHERE order_id = :OLD.order_id
+   )
+   WHERE book_id IN (
+       SELECT book_id 
+       FROM Order_Book 
+       WHERE order_id = :OLD.order_id
+   );
+END;
+/
+
+-- Create a trigger to update the discount of the student in the Student table after we Insert a new row into the Orders table or Delete
+CREATE OR REPLACE TRIGGER update_total_spent
+AFTER UPDATE ON Orders
+FOR EACH ROW
+DECLARE
+    year INT;
+    total DECIMAL(10,2);
+    discount DECIMAL(10,2);
+BEGIN
+    year := EXTRACT(YEAR FROM :NEW.order_date);
+    SELECT SUM(total_price) INTO total
+    FROM Orders
+    WHERE student_id = :NEW.student_id AND EXTRACT(YEAR FROM order_date) = year;
+
+    CASE
+        WHEN total > 2000 THEN discount := 0.2;
+        WHEN total > 1000 THEN discount := 0.1;
+        ELSE discount := 0;
+    END CASE;
+
+    UPDATE Student
+    SET discount = discount
+    WHERE student_id = :NEW.student_id;
+END;
+/
 
 -- COMMIT;
 
