@@ -1,0 +1,143 @@
+ER Diagram:
+
+
+Functionalities:
+
+Order search, update -> update select [⭐check]
+Order Placing -> insertion [⭐check]
+Order Canceling -> delete [⭐check]
+
+Triggers:
+
+Order add/cancel
+
+Updates "amount" field in "Books" table when an order to maintain accurate stock levels
+updates student's discount level in "Students" table based on their order history
+
+Confirm order
+If payment method is credit card, check if valid card number. If the card number is empty, the order cannot be confirmed and the student will need to provide a valid card number.
+
+Payment methods has to be credit card
+Compare using java string or payment method
+Then, check if card_no is null
+[Draft SQL]
+Tables:
+
+-- Create Book table
+CREATE TABLE Book (
+    book_id INT,
+    title CHAR(255) NOT NULL,
+    author CHAR(255) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    amount INT NOT NULL,
+    PRIMARY KEY (book_id)
+);
+
+-- Create Student table
+CREATE TABLE Student (
+    student_id INT,
+    name VARCHAR(255) NOT NULL,
+    gender VARCHAR(10) NOT NULL,
+    major VARCHAR(255) NOT NULL,
+    discount DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (student_id)
+);
+
+-- Create Order table
+CREATE TABLE Orders (
+    order_id INT,
+    student_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(20) NOT NULL,
+    card_no VARCHAR(16),
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id)
+);
+
+-- Create Order_Book table
+CREATE TABLE Orders_Book (
+    order_id INT,
+    book_id INT,
+    book_amount INT,
+    delivery_date DATE NOT NULL,
+    PRIMARY KEY (order_id, book_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    FOREIGN KEY (book_id) REFERENCES Book(book_id)
+);
+
+
+A student can enjoy 10% (20%) discount if her/his total order in the current year has exceeded $1,000 ($2,000).
+Triggers:
+After adding/canceling an order, the in-stock amount of each related book and the discount level of the student should be automatically adjusted.
+
+CREATE TRIGGER update_book_amount_after_order
+AFTER INSERT ON Orders
+FOR EACH ROW
+BEGIN
+   SELECT book_amount
+   FROM Order_Book
+   WHERE order_id = NEW.order_id;
+   UPDATE Book
+   SET amount = amount - book_amount
+   WHERE book_id IN (SELECT book_id FROM Order_Book WHERE order_id = NEW.order_id);
+END;
+
+
+CREATE TRIGGER update_book_amount_cancel_order
+AFTER INSERT ON Orders
+FOR EACH ROW
+BEGIN
+   SELECT book_amount
+   FROM Order_Book
+   WHERE order_id = NEW.order_id;
+   UPDATE Book
+   SET amount = amount + book_amount
+   WHERE book_id IN (SELECT book_id FROM Order_Book WHERE order_id = NEW.order_id);
+END;
+
+
+CREATE TRIGGER update_student_discount_after_order
+AFTER INSERT ON Orders
+FOR EACH ROW
+BEGIN
+   DECLARE year INT;
+   DECLARE total_spent INT;
+   SET year = YEAR(NEW.order_date);
+   SELECT SUM(total_price) INTO total_spent
+   FROM Orders
+   WHERE student_id = NEW.student_id
+   AND YEAR(order_date) = year;
+   IF (total_spent > 2000) THEN
+       UPDATE Student
+       SET discount = 0.2
+       WHERE student_id = NEW.student_id;
+   ELSEIF (total_spent > 1000) THEN
+       UPDATE Student
+       SET discount = 0.1
+       WHERE student_id = NEW.student_id;
+   ELSE
+       UPDATE Student
+       SET discount = 0.0
+       WHERE student_id = NEW.student_id;
+   END IF;
+END;
+
+
+CREATE TRIGGER check_card_no_before_confirm
+BEFORE INSERT ON Orders
+FOR EACH ROW
+BEGIN
+   IF (NEW.payment_method = 'credit card' AND NEW.card_no IS NULL) THEN
+       SIGNAL SQLSTATE '45000'
+           SET MESSAGE_TEXT = 'Error: Card no. is required for credit card payment';
+   END IF;
+END;
+
+
+
+
+
+
+Only order book if it is in stock [Add check to insert]
+WIth java, do the total price etc
