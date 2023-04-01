@@ -148,12 +148,22 @@ CREATE TRIGGER check_credit_card
 BEFORE INSERT ON Orders
 FOR EACH ROW
 BEGIN
+  -- Check if payment method is credit card and card number is valid
   IF NEW.payment_method = 'Credit Card' AND (NEW.card_no IS NULL OR length(NEW.card_no) != 16) THEN
     -- Raise an error if the card number is not valid
-    SELECT RAISE(ABORT, 'Invalid credit card number');
+    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
+  END IF;
+
+  -- Update total_price based on student discount
+  DECLARE student_discount DECIMAL(10,2);
+  SELECT discount INTO student_discount FROM Student WHERE student_id = NEW.student_id;
+
+  IF student_discount IS NOT NULL THEN
+    SET NEW.total_price = NEW.total_price * (1 - student_discount);
   END IF;
 END;
 /
+
 
 
 -- Create a trigger to check if we can cancel order
