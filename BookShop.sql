@@ -40,7 +40,11 @@ CREATE TABLE Orders_Book (
     book_id INT,
     book_amount INT,
     delivery_date DATE NOT NULL,
+<<<<<<< HEAD
     PRIMARY KEY (order_id, book_id)
+=======
+    PRIMARY KEY (order_id, book_id),
+>>>>>>> 656f5dfcacebcc60d9cc9f8d1c17997d8a4fc160
 );
 
 -- book alr exists
