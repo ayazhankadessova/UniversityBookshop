@@ -8,18 +8,17 @@ DROP TABLE Orders_Book CASCADE CONSTRAINT;
 
 CREATE TABLE Book (
     book_id INT,
-    title CHAR(255) NOT NULL,
-    author CHAR(255) NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    author CHAR(50) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     amount INT NOT NULL,
-    PRIMARY KEY (book_id)
-);
+    PRIMARY KEY (book_id));
 
 CREATE TABLE Student (
     student_id INT,
-    name VARCHAR(255) NOT NULL,
-    gender VARCHAR(10) NOT NULL,
-    major VARCHAR(255) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    gender VARCHAR(50) NOT NULL,
+    major VARCHAR(50) NOT NULL,
     total_spent INTEGER,
     discount DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (student_id)
@@ -93,6 +92,10 @@ INSERT INTO Orders_Book VALUES (3, 4, 2, '03-MAR-2023');
 INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
 INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
 
+
+--up to here
+
+
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
 BEFORE INSERT ON Orders_Book
@@ -109,21 +112,25 @@ BEGIN
 END;
 /
 
+-- to change
 -- Create a trigger to update the total price of the order in the Orders table after we Insert a new row into the Orders_Book table
 CREATE OR REPLACE TRIGGER update_total_price_and_amount
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
+DECLARE
+  v_book_amount NUMBER;
 BEGIN
-    UPDATE Orders
-    SET total_price = (SELECT SUM(Book.price * Orders_Book.book_amount)
-                       FROM Book
-                       JOIN Orders_Book ON Book.book_id = Orders_Book.book_id
-                       WHERE Orders_Book.order_id = :NEW.order_id)
-    WHERE order_id = :NEW.order_id;
+  v_book_amount := :NEW.book_amount;
+  
+  UPDATE Orders
+  SET total_price = (SELECT SUM(Book.price * v_book_amount)
+                     FROM Book
+                     WHERE Book.book_id = :NEW.book_id)
+  WHERE order_id = :NEW.order_id;
     
-    UPDATE Book
-    SET amount = amount - :NEW.book_amount
-    WHERE book_id = :NEW.book_id;
+  UPDATE Book
+  SET amount = amount - v_book_amount
+  WHERE book_id = :NEW.book_id;
 END;
 /
 
