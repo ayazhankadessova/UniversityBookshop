@@ -41,7 +41,6 @@ CREATE TABLE Orders_Book (
     book_amount INT,
     delivery_date DATE NOT NULL,
     PRIMARY KEY (order_id, book_id),
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES Book(book_id)
 );
 
