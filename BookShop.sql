@@ -81,16 +81,15 @@ INSERT INTO Orders VALUES (2, 3, '30-MAR-2023', 30.00, 'Debit Card', '6543210987
 INSERT INTO Orders VALUES (3, 2, '30-MAR-2023', 50.00, 'Credit Card', '9876543210123456');
 INSERT INTO Orders VALUES (4, 4, '31-MAR-2023', 20.00, 'PayPal', NULL);
 
-
 -- Insert into Orders_Book table
+-- DD-MON-YYYY' (e.g., 23-MAR-2022), 
 PROMPT INSERT Orders_Book TABLE;
-INSERT INTO Orders_Book VALUES (1, 1, 2, '2023-03-02');
-INSERT INTO Orders_Book VALUES (1, 3, 1, '2023-03-02');
-INSERT INTO Orders_Book VALUES (2, 2, 3, '2023-03-01');
-INSERT INTO Orders_Book VALUES (3, 4, 2, '2023-03-03');
-INSERT INTO Orders_Book VALUES (4, 1, 1, '2023-03-01');
-INSERT INTO Orders_Book VALUES (4, 2, 1, '2023-03-01');
-
+INSERT INTO Orders_Book VALUES (1, 1, 2, '02-MAR-2023');
+INSERT INTO Orders_Book VALUES (1, 3, 1, '02-MAR-2023');
+INSERT INTO Orders_Book VALUES (2, 2, 3, '01-MAR-2023');
+INSERT INTO Orders_Book VALUES (3, 4, 2, '03-MAR-2023');
+INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
+INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
 
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
