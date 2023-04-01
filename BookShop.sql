@@ -41,7 +41,6 @@ CREATE TABLE Orders_Book (
     book_amount INT,
     delivery_date DATE NOT NULL,
     PRIMARY KEY (order_id, book_id),
-    FOREIGN KEY (book_id) REFERENCES Book(book_id)
 );
 
 -- book alr exists
