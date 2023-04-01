@@ -76,11 +76,11 @@ INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 100, 0.
 INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 25, 0.02);
 
 -- Insert into Orders table
-PROMPT INSERT Orders TABLE;
-INSERT INTO Orders VALUES (1, 1, '29-MAR-2023', 40.00, 'Credit Card', '1234567890123456');
-INSERT INTO Orders VALUES (2, 3, '30-MAR-2023', 30.00, 'Debit Card', '6543210987654321');
-INSERT INTO Orders VALUES (3, 2, '30-MAR-2023', 50.00, 'Credit Card', '9876543210123456');
-INSERT INTO Orders VALUES (4, 4, '31-MAR-2023', 20.00, 'PayPal', NULL);
+-- PROMPT INSERT Orders TABLE;
+-- INSERT INTO Orders VALUES (1, 1, '29-MAR-2023', 40.00, 'Credit Card', '1234567890123456');
+-- INSERT INTO Orders VALUES (2, 3, '30-MAR-2023', 30.00, 'Debit Card', '6543210987654321');
+-- INSERT INTO Orders VALUES (3, 2, '30-MAR-2023', 50.00, 'Credit Card', '9876543210123456');
+-- INSERT INTO Orders VALUES (4, 4, '31-MAR-2023', 20.00, 'PayPal', NULL);
 
 -- Insert into Orders_Book table
 -- DD-MON-YYYY' (e.g., 23-MAR-2022), 
@@ -95,7 +95,7 @@ INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
 
 --up to here
 
-
+-- done
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
 BEFORE INSERT ON Orders_Book
@@ -112,28 +112,32 @@ BEGIN
 END;
 /
 
--- to change
+-- done
 -- Create a trigger to update the total price of the order in the Orders table after we Insert a new row into the Orders_Book table
 CREATE OR REPLACE TRIGGER update_total_price_and_amount 
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
+  --v_order_count NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
 
-  -- Insert into Orders table if it doesn't exist
-  IF NOT EXISTS (SELECT 1 FROM Orders WHERE order_id = :NEW.order_id) THEN
-    INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
-    VALUES (:NEW.order_id, :NEW.student_id, SYSDATE, 0, NULL, NULL);
-  END IF;
+--   -- Check if the order exists
+--   SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
 
-  -- Update total price in Orders table
-  UPDATE Orders
-  SET total_price = (SELECT SUM(Book.price * v_book_amount)
-                     FROM Book
-                     WHERE Book.book_id = :NEW.book_id)
-  WHERE order_id = :NEW.order_id;
+--   -- Insert into Orders table if it doesn't exist
+--   IF v_order_count = 0 THEN
+--     INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+--     VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
+--   END IF;
+
+--   -- Update total price in Orders table
+--   UPDATE Orders
+--   SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
+--                      FROM Book
+--                      WHERE Book.book_id = :NEW.book_id)
+--   WHERE order_id = :NEW.order_id;
 
   -- Update book amount
   UPDATE Book
@@ -143,6 +147,7 @@ END;
 /
 
 
+-- to check again
 -- Create a trigger to check if the credit card number is valid
 CREATE TRIGGER check_credit_card
 BEFORE INSERT ON Orders
@@ -155,18 +160,24 @@ BEGIN
 END;
 /
 
-
+--  to check again
 -- Create a trigger to check if we can cancel order
+CREATE OR REPLACE TRIGGER check_order_cancel
 BEFORE DELETE ON Orders
 FOR EACH ROW
 DECLARE
     order_age NUMBER;
     book_delivered NUMBER;
+    v_order_date DATE;
 BEGIN
-    -- Check order age
-    SELECT SYSDATE - order_date INTO order_age
-    FROM OrdersNew
+    -- Get the order date
+    SELECT order_date INTO v_order_date
+    FROM Orders
     WHERE order_id = :OLD.order_id;
+    
+    -- Check order age
+    SELECT SYSDATE - v_order_date INTO order_age
+    FROM dual;
 
     IF order_age > 7 THEN
         RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
@@ -175,7 +186,7 @@ BEGIN
     -- Check if any book has been delivered
     SELECT COUNT(*) INTO book_delivered
     FROM Orders_Book
-    WHERE order_id = :OLD.order_id AND delivery_date IS NOT NULL;
+    WHERE order_id = :OLD.order_id AND delivery_date > SYSDATE;
 
     IF book_delivered > 0 THEN
         RAISE_APPLICATION_ERROR(-20002, 'Cannot cancel order: some books have already been delivered');
@@ -183,6 +194,7 @@ BEGIN
 END;
 /
 
+-- to check again
 -- Create a trigger to update the total price of the order in the Orders table after we Delete a row from the Orders_Book table
 -- and update the amount of the book in the Book table
 -- and update the discount of the student in the Student table
@@ -203,6 +215,7 @@ BEGIN
    );
 END;
 /
+
 
 -- Create a trigger to update the discount of the student in the Student table after we Insert a new row into the Orders table or Delete
 CREATE OR REPLACE TRIGGER update_total_spent
