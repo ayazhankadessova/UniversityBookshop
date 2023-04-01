@@ -45,6 +45,8 @@ CREATE TABLE Orders_Book (
     PRIMARY KEY (order_id, book_id),
 );
 
+COMMIT;
+
 -- book alr exists
 
 ALTER TABLE Orders_Book
