@@ -5,6 +5,8 @@ DROP TABLE Student CASCADE CONSTRAINT;
 DROP TABLE Orders CASCADE CONSTRAINT;
 DROP TABLE Orders_Book CASCADE CONSTRAINT;
 
+COMMIT;
+
 
 CREATE TABLE Book (
     book_id INT,
@@ -19,7 +21,6 @@ CREATE TABLE Student (
     name VARCHAR(50) NOT NULL,
     gender VARCHAR(50) NOT NULL,
     major VARCHAR(50) NOT NULL,
-    --total_spent INTEGER,
     discount DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (student_id)
 );
@@ -48,7 +49,7 @@ CREATE TABLE Orders_Book (
 
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_BOOK_ID
-FOREIGN KEY (book_id) REFERENCES Book(book_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
+FOREIGN KEY (book_id) REFERENCES Book(book_id) INITIALLY DEFERRED DEFERRABLE;
 
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
@@ -66,10 +67,10 @@ INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel Garc√≠a M√
 
 -- Insert into Student table
 PROMPT INSERT Student TABLE;
-INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 50, 0.05);
-INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 75, 0.10);
-INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 100, 0.15);
-INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 25, 0.02);
+INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 0.05);
+INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 0.10);
+INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 0.15);
+INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.02);
 
 -- Insert into Orders table
 -- PROMPT INSERT Orders TABLE;
