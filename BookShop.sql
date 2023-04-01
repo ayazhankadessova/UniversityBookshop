@@ -208,6 +208,7 @@ END;
 -- Create a trigger to update the total price of the order in the Orders table after we Delete a row from the Orders_Book table
 -- and update the amount of the book in the Book table
 -- and update the discount of the student in the Student table
+--hey
 CREATE OR REPLACE TRIGGER check_credit_card
 BEFORE INSERT ON Orders
 FOR EACH ROW
