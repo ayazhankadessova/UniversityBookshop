@@ -127,16 +127,25 @@ BEGIN
 
   -- Insert into Orders table if it doesn't exist
   IF v_order_count = 0 THEN
-    INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+    INSERT INTO Orders
     VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
   END IF;
 
---   -- Update total price in Orders table
---   UPDATE Orders
---   SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
---                      FROM Book
---                      WHERE Book.book_id = :NEW.book_id)
---   WHERE order_id = :NEW.order_id;
+  -- Update total price in Orders table
+  UPDATE Orders
+  SET total_price = (
+    SELECT (
+      SUM(Book.price * v_book_amount) -
+      SUM(Book.price * v_book_amount) * (
+        SELECT COALESCE(discount, 0)
+        FROM Student
+        WHERE student_id = :NEW.student_id
+      )
+    )
+    FROM Book
+    WHERE Book.book_id = :NEW.book_id
+  ) + total_price
+  WHERE order_id = :NEW.order_id;
 
   -- Update book amount
   UPDATE Book
@@ -178,26 +187,26 @@ END;
 -- and update the amount of the book in the Book table
 -- and update the discount of the student in the Student table
 --hey
-CREATE OR REPLACE TRIGGER check_credit_card
-BEFORE INSERT ON Orders
-FOR EACH ROW
-DECLARE
-  student_discount DECIMAL(10,2);
-BEGIN
-  -- Check if payment method is credit card and card number is valid
-  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
-    -- Raise an error if the card number is not valid
-    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
-  END IF;
+-- CREATE OR REPLACE TRIGGER check_credit_card
+-- BEFORE INSERT ON Orders
+-- FOR EACH ROW
+-- DECLARE
+--   student_discount DECIMAL(10,2);
+-- BEGIN
+--   -- Check if payment method is credit card and card number is valid
+--   IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
+--     -- Raise an error if the card number is not valid
+--     RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
+--   END IF;
 
-  -- Update total_price based on student discount
-  SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
+--   -- Update total_price based on student discount
+--   SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
 
-  IF student_discount IS NOT NULL THEN
-    :NEW.total_price := :NEW.total_price * (1 - student_discount);
-  END IF;
-END;
-/
+--   IF student_discount IS NOT NULL THEN
+--     :NEW.total_price := :NEW.total_price * (1 - student_discount);
+--   END IF;
+-- END;
+-- /
 
 
 
@@ -227,40 +236,60 @@ END;
 -- END;
 -- /
 
-CREATE OR REPLACE TRIGGER update_total_spent
-AFTER INSERT OR DELETE ON Orders
-FOR EACH ROW
-BEGIN
-  update_student_discount(:OLD.student_id);
-  update_student_discount(:NEW.student_id);
-END;
-/
+-- CREATE OR REPLACE TRIGGER update_total_spent
+-- AFTER INSERT OR DELETE ON Orders
+-- FOR EACH ROW
+-- BEGIN
+--   update_student_discount(:OLD.student_id);
+--   update_student_discount(:NEW.student_id);
+-- END;
+-- /
 
-CREATE OR REPLACE PROCEDURE update_student_discount(student_id IN NUMBER) AS
-  year INT;
-  total DECIMAL(10,2);
-  discount DECIMAL(10,2);
-BEGIN
-  year := EXTRACT(YEAR FROM SYSDATE);
-  SELECT SUM(total_price) INTO total
-  FROM Orders
-  WHERE student_id = student_id AND EXTRACT(YEAR FROM order_date) = year;
+-- CREATE OR REPLACE PROCEDURE update_student_discount(student_id IN NUMBER) AS
+--   year INT;
+--   total DECIMAL(10,2);
+--   discount DECIMAL(10,2);
+-- BEGIN
+--   year := EXTRACT(YEAR FROM SYSDATE);
+--   SELECT SUM(total_price) INTO total
+--   FROM Orders
+--   WHERE student_id = student_id AND EXTRACT(YEAR FROM order_date) = year AND order_id != :NEW.order_id;
 
-  IF total IS NOT NULL THEN
-    IF total > 2000 THEN
-      discount := 0.20;
-    ELSIF total > 1000 THEN
-      discount := 0.10;
-    ELSE
-      discount := 0;
-    END IF;
+--   IF total IS NOT NULL THEN
+--     IF total > 2000 THEN
+--       discount := 0.20;
+--     ELSIF total > 1000 THEN
+--       discount := 0.10;
+--     ELSE
+--       discount := 0;
+--     END IF;
 
-    UPDATE Student
-    SET discount = discount
-    WHERE student_id = student_id;
-  END IF;
-END;
-/
+--     UPDATE Student
+--     SET discount = discount
+--     WHERE student_id = student_id;
+--   END IF;
+-- END;
+-- /
+
+-- UPDATE Student
+-- SET discount = (
+--   CASE
+--     WHEN (
+--       SELECT COALESCE(SUM(total_price), 0)
+--       FROM Orders
+--       WHERE student_id = 1
+--       AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+--     ) > 2000 THEN 0.20
+--     WHEN (
+--       SELECT COALESCE(SUM(total_price), 0)
+--       FROM Orders
+--       WHERE student_id = 1
+--       AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+--     ) > 1000 THEN 0.10
+--     ELSE 0
+--   END
+-- )
+-- WHERE student_id = 1;
 
 
 
