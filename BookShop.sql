@@ -41,11 +41,7 @@ CREATE TABLE Orders_Book (
     book_id INT,
     book_amount INT,
     delivery_date DATE NOT NULL,
-<<<<<<< HEAD
-    PRIMARY KEY (order_id, book_id)
-=======
     PRIMARY KEY (order_id, book_id),
->>>>>>> 656f5dfcacebcc60d9cc9f8d1c17997d8a4fc160
 );
 
 -- book alr exists
@@ -84,13 +80,13 @@ INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 25, 0.02);
 
 -- Insert into Orders_Book table
 -- DD-MON-YYYY' (e.g., 23-MAR-2022), 
-PROMPT INSERT Orders_Book TABLE;
-INSERT INTO Orders_Book VALUES (1, 1, 2, '02-MAR-2023');
-INSERT INTO Orders_Book VALUES (1, 3, 1, '02-MAR-2023');
-INSERT INTO Orders_Book VALUES (2, 2, 3, '01-MAR-2023');
-INSERT INTO Orders_Book VALUES (3, 4, 2, '03-MAR-2023');
-INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
-INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
+-- PROMPT INSERT Orders_Book TABLE;
+-- INSERT INTO Orders_Book VALUES (1, 1, 2, '02-MAR-2023');
+-- INSERT INTO Orders_Book VALUES (1, 3, 1, '02-MAR-2023');
+-- INSERT INTO Orders_Book VALUES (2, 2, 3, '01-MAR-2023');
+-- INSERT INTO Orders_Book VALUES (3, 4, 2, '03-MAR-2023');
+-- INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
+-- INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
 
 
 --up to here
@@ -156,14 +152,8 @@ DECLARE
     book_delivered NUMBER;
     v_order_date DATE;
 BEGIN
-    -- Get the order date
-    SELECT order_date INTO v_order_date
-    FROM Orders
-    WHERE order_id = :OLD.order_id;
-    
-    -- Check order age
-    SELECT SYSDATE - v_order_date INTO order_age
-    FROM dual;
+
+    order_age = :OLD.order_date - SYSDATE;
 
     IF order_age > 7 THEN
         RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
@@ -209,30 +199,67 @@ END;
 
 
 -- Create a trigger to update the discount of the student in the Student table after we Insert a new row into the Orders table or Delete
+-- CREATE OR REPLACE TRIGGER update_total_spent
+-- AFTER INSERT ON Orders
+-- FOR EACH ROW
+-- DECLARE
+--     year INT;
+--     total DECIMAL(10,2);
+--     discount DECIMAL(10,2);
+-- BEGIN
+--     year := EXTRACT(YEAR FROM :NEW.order_date);
+--     SELECT SUM(total_price) INTO total
+--     FROM Orders
+--     WHERE student_id = :NEW.student_id AND EXTRACT(YEAR FROM order_date) = year;
+
+--     CASE
+--         WHEN total > 2000 THEN discount := 0.20;
+--         WHEN total > 1000 THEN discount := 0.10;
+--         ELSE discount := 0;
+--     END CASE;
+
+--     UPDATE Student
+--     SET Student.discount = discount
+--     WHERE student_id = :NEW.student_id;
+-- END;
+-- /
+
 CREATE OR REPLACE TRIGGER update_total_spent
-AFTER UPDATE ON Orders
+AFTER INSERT OR DELETE ON Orders
 FOR EACH ROW
-DECLARE
-    year INT;
-    total DECIMAL(10,2);
-    discount DECIMAL(10,2);
 BEGIN
-    year := EXTRACT(YEAR FROM :NEW.order_date);
-    SELECT SUM(total_price) INTO total
-    FROM Orders
-    WHERE student_id = :NEW.student_id AND EXTRACT(YEAR FROM order_date) = year;
-
-    CASE
-        WHEN total > 2000 THEN discount := 0.20;
-        WHEN total > 1000 THEN discount := 0.10;
-        ELSE discount := 0;
-    END CASE;
-
-    UPDATE Student
-    SET Student.discount = discount
-    WHERE student_id = :NEW.student_id;
+  update_student_discount(:OLD.student_id);
+  update_student_discount(:NEW.student_id);
 END;
 /
+
+CREATE OR REPLACE PROCEDURE update_student_discount(student_id IN NUMBER) AS
+  year INT;
+  total DECIMAL(10,2);
+  discount DECIMAL(10,2);
+BEGIN
+  year := EXTRACT(YEAR FROM SYSDATE);
+  SELECT SUM(total_price) INTO total
+  FROM Orders
+  WHERE student_id = student_id AND EXTRACT(YEAR FROM order_date) = year;
+
+  IF total IS NOT NULL THEN
+    IF total > 2000 THEN
+      discount := 0.20;
+    ELSIF total > 1000 THEN
+      discount := 0.10;
+    ELSE
+      discount := 0;
+    END IF;
+
+    UPDATE Student
+    SET discount = discount
+    WHERE student_id = student_id;
+  END IF;
+END;
+/
+
+
 
 -- COMMIT;
 
