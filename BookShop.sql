@@ -223,13 +223,13 @@ BEGIN
     WHERE student_id = :NEW.student_id AND EXTRACT(YEAR FROM order_date) = year;
 
     CASE
-        WHEN total > 2000 THEN discount := 0.2;
-        WHEN total > 1000 THEN discount := 0.1;
+        WHEN total > 2000 THEN discount := 0.20;
+        WHEN total > 1000 THEN discount := 0.10;
         ELSE discount := 0;
     END CASE;
 
     UPDATE Student
-    SET discount = discount
+    SET Student.discount = discount
     WHERE student_id = :NEW.student_id;
 END;
 /
