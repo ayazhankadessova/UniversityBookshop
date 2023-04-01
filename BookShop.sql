@@ -118,18 +118,18 @@ AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
-  --v_order_count NUMBER;
+  v_order_count NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
 
---   -- Check if the order exists
---   SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
+  -- Check if the order exists
+  SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
 
---   -- Insert into Orders table if it doesn't exist
---   IF v_order_count = 0 THEN
---     INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
---     VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
---   END IF;
+  -- Insert into Orders table if it doesn't exist
+  IF v_order_count = 0 THEN
+    INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+    VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
+  END IF;
 
 --   -- Update total price in Orders table
 --   UPDATE Orders
@@ -156,7 +156,7 @@ DECLARE
     v_order_date DATE;
 BEGIN
 
-    order_age = :OLD.order_date - SYSDATE;
+    order_age := :OLD.order_date - SYSDATE;
 
     IF order_age > 7 THEN
         RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
