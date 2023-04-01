@@ -208,23 +208,27 @@ END;
 -- Create a trigger to update the total price of the order in the Orders table after we Delete a row from the Orders_Book table
 -- and update the amount of the book in the Book table
 -- and update the discount of the student in the Student table
-CREATE OR REPLACE TRIGGER update_book_amount_cancel_order
-AFTER DELETE ON Orders
+CREATE OR REPLACE TRIGGER check_credit_card
+BEFORE INSERT ON Orders
 FOR EACH ROW
+DECLARE
+  student_discount DECIMAL(10,2);
 BEGIN
-   UPDATE Book
-   SET amount = amount + (
-       SELECT book_amount
-       FROM Order_Book
-       WHERE order_id = :OLD.order_id
-   )
-   WHERE book_id IN (
-       SELECT book_id 
-       FROM Order_Book 
-       WHERE order_id = :OLD.order_id
-   );
+  -- Check if payment method is credit card and card number is valid
+  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
+    -- Raise an error if the card number is not valid
+    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
+  END IF;
+
+  -- Update total_price based on student discount
+  SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
+
+  IF student_discount IS NOT NULL THEN
+    :NEW.total_price := :NEW.total_price * (1 - student_discount);
+  END IF;
 END;
 /
+
 
 
 -- Create a trigger to update the discount of the student in the Student table after we Insert a new row into the Orders table or Delete
