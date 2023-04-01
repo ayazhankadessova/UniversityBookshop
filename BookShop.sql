@@ -114,25 +114,34 @@ END;
 
 -- to change
 -- Create a trigger to update the total price of the order in the Orders table after we Insert a new row into the Orders_Book table
-CREATE OR REPLACE TRIGGER update_total_price_and_amount
+CREATE OR REPLACE TRIGGER update_total_price_and_amount 
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
-  
+
+  -- Insert into Orders table if it doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM Orders WHERE order_id = :NEW.order_id) THEN
+    INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+    VALUES (:NEW.order_id, :NEW.student_id, SYSDATE, 0, NULL, NULL);
+  END IF;
+
+  -- Update total price in Orders table
   UPDATE Orders
   SET total_price = (SELECT SUM(Book.price * v_book_amount)
                      FROM Book
                      WHERE Book.book_id = :NEW.book_id)
   WHERE order_id = :NEW.order_id;
-    
+
+  -- Update book amount
   UPDATE Book
   SET amount = amount - v_book_amount
   WHERE book_id = :NEW.book_id;
 END;
 /
+
 
 -- Create a trigger to check if the credit card number is valid
 CREATE TRIGGER check_credit_card
