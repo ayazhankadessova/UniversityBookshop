@@ -50,7 +50,7 @@ public class FlightManager {
 
 	String[] options = { // if you want to add an option, append to the end of
 							// this array
-			"order search", "order place", "order cancel",
+			"order searchs", "order place", "order cancel",
 			"exit" };
 
 	/**
