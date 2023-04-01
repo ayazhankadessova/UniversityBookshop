@@ -126,26 +126,17 @@ BEGIN
   SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
 
   -- Insert into Orders table if it doesn't exist
-  IF v_order_count = 0 THEN
-    INSERT INTO Orders
-    VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
-  END IF;
+  -- IF v_order_count = 0 THEN
+  --   INSERT INTO Orders
+  --   VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
+  -- END IF;
 
-  -- Update total price in Orders table
-  UPDATE Orders
-  SET total_price = (
-    SELECT (
-      SUM(Book.price * v_book_amount) -
-      SUM(Book.price * v_book_amount) * (
-        SELECT COALESCE(discount, 0)
-        FROM Student
-        WHERE student_id = :NEW.student_id
-      )
-    )
-    FROM Book
-    WHERE Book.book_id = :NEW.book_id
-  ) + total_price
-  WHERE order_id = :NEW.order_id;
+  -- -- Update total price in Orders table
+  -- UPDATE Orders
+  -- SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
+  --                    FROM Book
+  --                    WHERE Book.book_id = :NEW.book_id)
+  -- WHERE order_id = :NEW.order_id;
 
   -- Update book amount
   UPDATE Book
@@ -187,26 +178,26 @@ END;
 -- and update the amount of the book in the Book table
 -- and update the discount of the student in the Student table
 --hey
--- CREATE OR REPLACE TRIGGER check_credit_card
--- BEFORE INSERT ON Orders
--- FOR EACH ROW
--- DECLARE
---   student_discount DECIMAL(10,2);
--- BEGIN
---   -- Check if payment method is credit card and card number is valid
---   IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
---     -- Raise an error if the card number is not valid
---     RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
---   END IF;
+CREATE OR REPLACE TRIGGER check_credit_card
+BEFORE INSERT ON Orders
+FOR EACH ROW
+DECLARE
+  student_discount DECIMAL(10,2);
+BEGIN
+  -- Check if payment method is credit card and card number is valid
+  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
+    -- Raise an error if the card number is not valid
+    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
+  END IF;
 
---   -- Update total_price based on student discount
---   SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
+  -- Update total_price based on student discount
+  SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
 
---   IF student_discount IS NOT NULL THEN
---     :NEW.total_price := :NEW.total_price * (1 - student_discount);
---   END IF;
--- END;
--- /
+  IF student_discount IS NOT NULL THEN
+    :NEW.total_price := :NEW.total_price * (1 - student_discount);
+  END IF;
+END;
+/
 
 
 
