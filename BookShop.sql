@@ -42,7 +42,7 @@ CREATE TABLE Orders_Book (
     book_id INT,
     book_amount INT,
     delivery_date DATE NOT NULL,
-    PRIMARY KEY (order_id, book_id),
+    PRIMARY KEY (order_id, book_id)
 );
 
 COMMIT;
