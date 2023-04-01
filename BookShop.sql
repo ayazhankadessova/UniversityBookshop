@@ -40,19 +40,18 @@ CREATE TABLE Orders_Book (
     book_id INT,
     book_amount INT,
     delivery_date DATE NOT NULL,
-    PRIMARY KEY (order_id, book_id),
-    FOREIGN KEY (book_id) REFERENCES Book(book_id)
+    PRIMARY KEY (order_id, book_id)
 );
 
 -- book alr exists
 
 ALTER TABLE Orders_Book
-ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
-FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
-
-ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_BOOK_ID
 FOREIGN KEY (book_id) REFERENCES Book(book_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
+
+ALTER TABLE Orders_Book
+ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
+FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
 
 COMMIT;
 
@@ -73,10 +72,10 @@ INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 25, 0.02);
 
 -- Insert into Orders table
 PROMPT INSERT Orders TABLE;
-INSERT INTO Orders VALUES (1, 1, '2023-03-29', 40.00, 'Credit Card', '1234567890123456');
-INSERT INTO Orders VALUES (2, 3, '2023-03-30', 30.00, 'Debit Card', '6543210987654321');
-INSERT INTO Orders VALUES (3, 2, '2023-03-30', 50.00, 'Credit Card', '9876543210123456');
-INSERT INTO Orders VALUES (4, 4, '2023-03-31', 20.00, 'PayPal', NULL);
+INSERT INTO Orders VALUES (1, 1, '29-MAR-2023', 40.00, 'Credit Card', '1234567890123456');
+INSERT INTO Orders VALUES (2, 3, '30-MAR-2023', 30.00, 'Debit Card', '6543210987654321');
+INSERT INTO Orders VALUES (3, 2, '30-MAR-2023', 50.00, 'Credit Card', '9876543210123456');
+INSERT INTO Orders VALUES (4, 4, '31-MAR-2023', 20.00, 'PayPal', NULL);
 
 
 -- Insert into Orders_Book table
