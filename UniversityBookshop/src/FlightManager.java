@@ -51,7 +51,8 @@ public class FlightManager {
 
 	String[] options = { // if you want to add an option, append to the end of
 							// this array
-			"order search", "order place", "order cancel",
+			"order search by OrderID", "order search by StudentID", "order place", "order cancel", "show all books",
+			"show all orders",
 			"exit" };
 
 	/**
@@ -189,42 +190,53 @@ public class FlightManager {
 				continue;
 			}
 			if (choice == 1) {
-				orderSearch();
-				// addFlight();
+				orderSearchbyID();
 			} else if (choice == 2) {
-				placeorder();
+				orderSearchforStudent();
 			} else if (choice == 3) {
-				// cancelorder()
-				printFlightByNo();
-				// } else if (options[choice - 1].equals("select a flight (by source, dest,
-				// stop_no = 0)")) {
-				// selectFlightsInZeroStop();
-				// } else if (options[choice - 1].equals("select a flight (by source, dest,
-				// stop_no = 1)")) {
-				// selectFlightsInOneStop();
+				placeOrder();
+
+			} else if (choice == 4) {
+				// cancelorder();
+			} else if (choice == 5) {
+				displayBooks();
+			} else if (choice == 6) {
+				listAllOrders();
 			} else if (options[choice - 1].equals("exit")) {
 				break;
 			}
 		}
 	}
 
-	private void orderSearch(String student_id) {
+	private void orderSearchforStudent() {
+		int student_id = askForStudentId();
+
+		if (student_id == -1) {
+			System.out.println("No valid student ID was entered. Exiting the order search process.");
+			return;
+		}
+		orderSearch(student_id);
+
+	}
+
+	private void orderSearch(int student_id) {
 		try {
 			Statement stm = conn.createStatement();
-			String sql = "SELECT * FROM Orders WHERE Student_id = '" + student_id + "'";
+			String sql = "SELECT order_id FROM Orders WHERE Student_id =" + student_id;
 			ResultSet rs = stm.executeQuery(sql);
-			if (!rs.next())
+			if (!rs.next()) {
+				System.out.println("No order found");
 				return;
-			String[] heads = { "Flight_no", "Depart_Time", "Arrive_Time", "Fare", "Source", "Dest" };
-			for (int i = 0; i < 6; ++i) { // flight table 6 attributes
-				try {
-					System.out.println(heads[i] + " : " + rs.getString(i + 1)); // attribute
-
-					// 1
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 			}
+
+			while (rs.next()) { // this is the result record iterator, see the
+
+				orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+
+			}
+			rs.close();
+			stm.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			noException = false;
@@ -234,19 +246,21 @@ public class FlightManager {
 	/**
 	 * List all flights in the database.
 	 */
-	private void listAllFlights() {
-		System.out.println("All flights in the database now:");
+	private void listAllOrders() {
+		System.out.println("All orders in the database now:");
 		try {
 			Statement stm = conn.createStatement();
-			String sql = "SELECT Flight_no FROM FLIGHTS";
+			String sql = "SELECT order_id FROM Orders";
+			System.out.println(sql);
+
 			ResultSet rs = stm.executeQuery(sql);
 
-			int resultCount = 0;
-			while (rs.next()) {
-				System.out.println(rs.getString(1));
-				++resultCount;
+			while (rs.next()) { // this is the result record iterator, see the
+
+				orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+
 			}
-			System.out.println("Total " + resultCount + " flight(s).");
 			rs.close();
 			stm.close();
 		} catch (SQLException e) {
@@ -258,15 +272,26 @@ public class FlightManager {
 	/**
 	 * Select out a flight according to the flight_no.
 	 */
-	private void printFlightByNo() {
-		listAllFlights();
-		System.out.println("Please input the flight_no to print info:");
-		String line = in.nextLine();
-		line = line.trim();
-		if (line.equalsIgnoreCase("exit"))
+	// private void printFlightByNo() {
+	// listAllFlights();
+	// System.out.println("Please input the flight_no to print info:");
+	// String line = in.nextLine();
+	// line = line.trim();
+	// if (line.equalsIgnoreCase("exit"))
+	// return;
+
+	// // printFlightInfo(line);
+	// }
+
+	private void orderSearchbyID() {
+		System.out.println("Please input order_id or -1 for exit:");
+
+		int order_id = in.nextInt();
+
+		if (order_id == -1)
 			return;
 
-		// printFlightInfo(line);
+		orderSearchbyID(order_id);
 	}
 
 	/**
@@ -274,19 +299,7 @@ public class FlightManager {
 	 * directly. For example, given HK, Tokyo, you may find HK -> Tokyo Your job
 	 * to fill in this function.
 	 */
-	private void orderSearch() {
-		System.out.println("Please input order_id:");
-
-		String line = in.nextLine();
-
-		if (line.equalsIgnoreCase("exit"))
-			return;
-
-		int order_id = Integer.parseInt(line);
-
-		String[] values = line.split(",");
-		for (int i = 0; i < values.length; ++i)
-			values[i] = values[i].trim();
+	private void orderSearchbyID(int order_id) {
 
 		try {
 			/**
@@ -300,21 +313,63 @@ public class FlightManager {
 
 			ResultSet rs = stm.executeQuery(sql);
 
-			int resultCount = 0; // a counter to count the number of result
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
+				return;
+			}
 
-			while (rs.next()) { // this is the result record iterator, see the
-
-				String[] heads = { "order_d", "student_id", "order_date", "total_price", "payment_m", "card_no" };
+			while (rs.next()) {
+				String[] heads = { "order_id", "student_id", "order_date", "total_price", "payment_m", "card_no" };
 				for (int i = 0; i < 6; ++i) {
 					try {
-						// result = rs.getString(i + 1);
-						System.out.println(heads[i] + " : " + rs.getString(i + 1));
-						// System.out.print(result);
+						String result = "";
+						if (heads[i].equals("order_id") || heads[i].equals("student_id")) {
+							result = Integer.toString(rs.getInt(i + 1));
+						} else if (heads[i].equals("order_date")) {
+							result = rs.getDate(i + 1).toString();
+						} else if (heads[i].equals("total_price")) {
+							result = Double.toString(rs.getDouble(i + 1));
+						} else {
+							result = rs.getString(i + 1);
+						}
+						System.out.println(heads[i] + " : " + result);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
 				}
-				++resultCount;
+				System.out.println("============================================");
+			}
+			rs.close();
+			stm.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			noException = false;
+		}
+	}
+
+	/**
+	 * Given source and dest, select all the flights can arrive the dest
+	 * directly. For example, given HK, Tokyo, you may find HK -> Tokyo Your job
+	 * to fill in this function.
+	 */
+	private void displayBooks() {
+
+		try {
+			/**
+			 * Create the statement and sql
+			 */
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT book_id FROM Book";
+
+			System.out.println(sql);
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			while (rs.next()) { // this is the result record iterator, see the
+
+				diplayBook(rs.getInt(1));
 				System.out.println("============================================");
 				//
 			}
@@ -323,6 +378,36 @@ public class FlightManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			noException = false;
+		}
+	}
+
+	public void diplayBook(int book_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Book WHERE book_id = " + book_id;
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			while (rs.next()) { // this is the result record iterator, see the
+
+				String[] heads = { "book_id", "title", "author", "price", "amount" };
+				for (int i = 0; i < 5; ++i) {
+					try {
+						// result = rs.getString(i + 1);
+						System.out.println(heads[i] + " : " + rs.getString(i + 1));
+						// System.out.print(result);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			rs.close();
+			stm.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			noException = false;
+
 		}
 	}
 
@@ -435,6 +520,10 @@ public class FlightManager {
 
 			boolean exists = result.next();
 
+			if (!exists) {
+				System.out.println("No such book");
+			}
+
 			stm.close();
 			result.close();
 
@@ -445,31 +534,107 @@ public class FlightManager {
 		}
 	}
 
+	public boolean checkOrder(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Orders WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			stm.close();
+			result.close();
+
+			return exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean checkBook(int book_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Book WHERE book_id = " + book_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			stm.close();
+			result.close();
+
+			return exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public int askBookId() {
+		int book_id = -1;
+		boolean valid_id = false;
+
+		while (!valid_id) {
+			System.out.print("Enter book ID (or -1 to exit): ");
+			book_id = in.nextInt();
+			in.nextLine(); // consume the remaining newline character
+
+			if (book_id == -1) {
+				return -1; // Return -1 to indicate program exit
+			} else if (checkBook(book_id)) {
+				valid_id = true;
+			} else {
+				System.out.println("Invalid book ID.");
+			}
+		}
+
+		return book_id;
+	}
+
 	/**
 	 * Insert data into database
 	 * 
 	 * @return
 	 */
-	private void placeorder() {
+	private void placeOrder() {
 		/**
 		 * A sample input is:
 		 */
 		int student_id = askForStudentId();
 
-		if (student_id == -1)
+		if (student_id == -1) {
+			System.out.println("No valid student ID was entered. Exiting the order placement process.");
 			return;
+		}
 
 		// int student_id = Integer.parseInt(line);
 
-		System.out.println("Please input order-id:");
-		int order_id = Integer.parseInt(in.nextLine());
+		int order_id = 0;
+		Random rand = new Random();
+
+		do {
+			order_id = rand.nextInt(9001) + 1000; // Generate a random order ID between 1000 and 10000
+		} while (checkOrder(order_id)); // Keep looping while the order ID is already taken
+
+		System.out.println("Order ID: " + order_id);
+
+		System.out.println("Here are our Books:");
+
+		displayBooks();
 
 		// Prompt the user to enter the number of different books to order
 		System.out.print("How many different books would you like to order? ");
 		int numBooks = in.nextInt();
 		in.nextLine(); // consume the remaining newline character
 
-		int counter = 0;
 		double total_price = 0;
 
 		// Create an ArrayList to record successful book orders
@@ -481,12 +646,12 @@ public class FlightManager {
 		for (int i = 1; i <= numBooks; i++) {
 			System.out.println("Enter information for book " + i + "....");
 
-			// Prompt the user to enter the book ID
-			System.out.print("Book ID: ");
+			int bookId = askBookId();
 
-			// if already in order
-			int bookId = in.nextInt();
-			in.nextLine(); // consume the remaining newline character
+			if (bookId == -1) {
+				System.out.println("No valid book ID was entered. Exiting the order placement process.");
+				return;
+			}
 
 			// Check if the book ID is already in the order
 			if (addedBookIds.contains(bookId)) {
@@ -528,7 +693,6 @@ public class FlightManager {
 						// Add the total price difference for this book to the overall total price
 						total_price += book_total_price_diff;
 
-						counter++;
 					}
 				} else {
 					continue;
@@ -560,15 +724,11 @@ public class FlightManager {
 					// Add the total price for this book to the overall total price
 					total_price += book_total_price;
 
-					counter++;
-
 				}
 			}
 		}
 
-		if (counter > 0) {
-			// updateTotal(order_id, student_id);
-			// total_price = getTotalById(order_id);
+		if (orders.size() > 0) {
 
 			double discount = getDiscount(student_id);
 			total_price = total_price * (1 - discount);
@@ -821,47 +981,47 @@ public class FlightManager {
 	/**
 	 * Please fill in this function to delete a flight.
 	 */
-	public void deleteFlight() {
-		listAllFlights();
-		System.out.println("Please input the flight_no to delete:");
-		String line = in.nextLine();
+	// public void deleteFlight() {
+	// listAllFlights();
+	// System.out.println("Please input the flight_no to delete:");
+	// String line = in.nextLine();
 
-		if (line.equalsIgnoreCase("exit"))
-			return;
-		line = line.trim();
+	// if (line.equalsIgnoreCase("exit"))
+	// return;
+	// line = line.trim();
 
-		try {
-			Statement stm = conn.createStatement();
+	// try {
+	// Statement stm = conn.createStatement();
 
-			String sql = "Delete from FLIGHTS " + "Where Flight_no = '" + line + "'";
+	// String sql = "Delete from FLIGHTS " + "Where Flight_no = '" + line + "'";
 
-			System.out.println(sql);
+	// System.out.println(sql);
 
-			/*
-			 * Formuate your own SQL query:
-			 *
-			 * sql = "...";
-			 *
-			 */
+	// /*
+	// * Formuate your own SQL query:
+	// *
+	// * sql = "...";
+	// *
+	// */
 
-			stm.executeUpdate(sql); // please pay attention that we use
-									// executeUpdate to update the database
+	// stm.executeUpdate(sql); // please pay attention that we use
+	// // executeUpdate to update the database
 
-			stm.close();
+	// stm.close();
 
-			/*
-			 * You may uncomment the statement below after formulating the SQL
-			 * query above
-			 *
-			 * System.out.println("succeed to delete flight " + line);
-			 *
-			 */
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("fail to delete flight " + line);
-			noException = false;
-		}
-	}
+	// /*
+	// * You may uncomment the statement below after formulating the SQL
+	// * query above
+	// *
+	// * System.out.println("succeed to delete flight " + line);
+	// *
+	// */
+	// } catch (SQLException e) {
+	// e.printStackTrace();
+	// System.out.println("fail to delete flight " + line);
+	// noException = false;
+	// }
+	// }
 
 	/**
 	 * Close the manager. Do not change this function.
