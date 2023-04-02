@@ -27,7 +27,7 @@ import com.jcraft.jsch.Session;
  * @author comp1160/2016
  */
 
-public class FlightManager {
+public class UniversityBookshop {
 
 	Scanner in = null;
 	Connection conn = null;
@@ -203,7 +203,7 @@ public class FlightManager {
 				displayBooks();
 			} else if (choice == 6) {
 				listAllOrders();
-			} else if (options[choice - 1].equals("exit")) {
+			} else if (options[choice - 1].equalsIgnoreCase("exit")) {
 				break;
 			}
 		}
@@ -1087,7 +1087,7 @@ public class FlightManager {
 	/**
 	 * Constructor of flight manager Do not change this function.
 	 */
-	public FlightManager() {
+	public UniversityBookshop() {
 		System.out.println("Welcome to use this manager!");
 		in = new Scanner(System.in);
 	}
@@ -1098,7 +1098,7 @@ public class FlightManager {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FlightManager manager = new FlightManager();
+		UniversityBookshop manager = new UniversityBookshop();
 		if (!manager.loginProxy()) {
 			System.out.println("Login proxy failed, please re-examine your username and password!");
 			return;
