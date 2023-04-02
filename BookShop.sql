@@ -42,16 +42,17 @@ CREATE TABLE Orders_Book (
     book_id INT,
     book_amount INT,
     delivery_date DATE NOT NULL,
-    PRIMARY KEY (order_id, book_id)
+    PRIMARY KEY (order_id, book_id),
+    FOREIGN KEY (book_id) REFERENCES Book(book_id)
 );
 
 COMMIT;
 
 -- book alr exists
 
-ALTER TABLE Orders_Book
-ADD CONSTRAINT FK_ORDERS_BOOK_BOOK_ID
-FOREIGN KEY (book_id) REFERENCES Book(book_id) INITIALLY DEFERRED DEFERRABLE;
+-- ALTER TABLE Orders_Book
+-- ADD CONSTRAINT FK_ORDERS_BOOK_BOOK_ID
+-- FOREIGN KEY (book_id) REFERENCES Book(book_id) INITIALLY DEFERRED DEFERRABLE;
 
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
@@ -125,13 +126,13 @@ BEGIN
   -- Check if the order exists
   SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
 
-  -- Insert into Orders table if it doesn't exist
+  -- -- Insert into Orders table if it doesn't exist
   -- IF v_order_count = 0 THEN
   --   INSERT INTO Orders
   --   VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
   -- END IF;
 
-  -- -- Update total price in Orders table
+  -- -- -- -- Update total price in Orders table
   -- UPDATE Orders
   -- SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
   --                    FROM Book
@@ -262,25 +263,25 @@ END;
 -- END;
 -- /
 
--- UPDATE Student
--- SET discount = (
---   CASE
---     WHEN (
---       SELECT COALESCE(SUM(total_price), 0)
---       FROM Orders
---       WHERE student_id = 1
---       AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
---     ) > 2000 THEN 0.20
---     WHEN (
---       SELECT COALESCE(SUM(total_price), 0)
---       FROM Orders
---       WHERE student_id = 1
---       AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
---     ) > 1000 THEN 0.10
---     ELSE 0
---   END
--- )
--- WHERE student_id = 1;
+UPDATE Student
+SET discount = (
+  CASE
+    WHEN (
+      SELECT COALESCE(SUM(total_price), 0)
+      FROM Orders
+      WHERE student_id = 1
+      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    ) > 2000 THEN 0.20
+    WHEN (
+      SELECT COALESCE(SUM(total_price), 0)
+      FROM Orders
+      WHERE student_id = 1
+      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    ) > 1000 THEN 0.10
+    ELSE 0
+  END
+)
+WHERE student_id = 1;
 
 
 
