@@ -51,9 +51,10 @@ public class FlightManager {
 
 	String[] options = { // if you want to add an option, append to the end of
 							// this array
-			"order search by OrderID", "order search by StudentID", "order place", "order cancel", "show all books",
-			"show all orders",
-			"exit" };
+			"Search Order by OrderID", "Search Order by StudentID", "Place an Order", "Cancel an Order",
+			"Show All Books",
+			"Show All Orders",
+			"Exit" };
 
 	/**
 	 * Get YES or NO. Do not change this function.
@@ -132,13 +133,13 @@ public class FlightManager {
 	}
 
 	/**
-	 * Login the oracle system. Change this function under instruction.
+	 * Login the oracle system. Change for your own credentials.
 	 * 
 	 * @return boolean
 	 */
 	public boolean loginDB() {
-		String username = "***REMOVED***";// Replace e1234567 to your username
-		String password = "***REMOVED***";// Replace e1234567 to your password
+		String username = "***REMOVED***";// Replace to your username
+		String password = "***REMOVED***";// Replace to your password
 
 		/* Do not change the code below */
 		if (username.equalsIgnoreCase("e1234567") || password.equalsIgnoreCase("e1234567")) {
@@ -208,6 +209,17 @@ public class FlightManager {
 		}
 	}
 
+	private void orderSearchbyID() {
+		System.out.println("Please input order_id or -1 for exit:");
+
+		int order_id = in.nextInt();
+
+		if (order_id == -1)
+			return;
+
+		orderSearchbyID(order_id);
+	}
+
 	private void orderSearchforStudent() {
 		int student_id = askForStudentId();
 
@@ -215,11 +227,11 @@ public class FlightManager {
 			System.out.println("No valid student ID was entered. Exiting the order search process.");
 			return;
 		}
-		orderSearch(student_id);
+		orderSearchbyStudentID(student_id);
 
 	}
 
-	private void orderSearch(int student_id) {
+	private void orderSearchbyStudentID(int student_id) {
 		try {
 			Statement stm = conn.createStatement();
 			String sql = "SELECT order_id FROM Orders WHERE Student_id =" + student_id;
@@ -247,7 +259,7 @@ public class FlightManager {
 	}
 
 	/**
-	 * List all flights in the database.
+	 * List all Orders in the database.
 	 */
 	private void listAllOrders() {
 		System.out.println("All orders in the database now:");
@@ -273,34 +285,7 @@ public class FlightManager {
 	}
 
 	/**
-	 * Select out a flight according to the flight_no.
-	 */
-	// private void printFlightByNo() {
-	// listAllFlights();
-	// System.out.println("Please input the flight_no to print info:");
-	// String line = in.nextLine();
-	// line = line.trim();
-	// if (line.equalsIgnoreCase("exit"))
-	// return;
-
-	// // printFlightInfo(line);
-	// }
-
-	private void orderSearchbyID() {
-		System.out.println("Please input order_id or -1 for exit:");
-
-		int order_id = in.nextInt();
-
-		if (order_id == -1)
-			return;
-
-		orderSearchbyID(order_id);
-	}
-
-	/**
-	 * Given source and dest, select all the flights can arrive the dest
-	 * directly. For example, given HK, Tokyo, you may find HK -> Tokyo Your job
-	 * to fill in this function.
+	 * Given order_id, find All info about the order.
 	 */
 	private void orderSearchbyID(int order_id) {
 
@@ -353,7 +338,6 @@ public class FlightManager {
 					}
 					System.out.println(heads[i] + " : " + result);
 				}
-				System.out.println("============================================");
 				exists = rs.next();
 			}
 
@@ -366,9 +350,7 @@ public class FlightManager {
 	}
 
 	/**
-	 * Given source and dest, select all the flights can arrive the dest
-	 * directly. For example, given HK, Tokyo, you may find HK -> Tokyo Your job
-	 * to fill in this function.
+	 * Show all Books.
 	 */
 	private void displayBooks() {
 
@@ -398,6 +380,9 @@ public class FlightManager {
 		}
 	}
 
+	/*
+	 * Given book_id, display all info about the book.
+	 */
 	public void diplayBook(int book_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -428,6 +413,10 @@ public class FlightManager {
 		}
 	}
 
+	/**
+	 * Given order_id, get total price.
+	 */
+
 	public double getTotalById(int order_id) {
 
 		double result = 0;
@@ -457,6 +446,10 @@ public class FlightManager {
 		return result;
 
 	}
+
+	/**
+	 * Given student_id, update discount.
+	 */
 
 	public void updateDiscount(int student_id) {
 
@@ -498,6 +491,10 @@ public class FlightManager {
 		}
 	}
 
+	////////////////////////// Helper Functions //////////////////////////
+	/*
+	 * Ask to enter a student ID.
+	 */
 	public int askForStudentId() {
 		while (true) {
 			// prompt the user for a student ID
@@ -525,6 +522,9 @@ public class FlightManager {
 
 	}
 
+	/*
+	 * Check if the student ID exists in the database.
+	 */
 	public boolean checkStudentId(int student_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -549,75 +549,6 @@ public class FlightManager {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	public boolean checkOrder(int order_id) {
-		try {
-			Statement stm = conn.createStatement();
-
-			String sql = "SELECT * FROM Orders WHERE order_id = " + order_id;
-
-			System.out.println(sql);
-
-			ResultSet result = stm.executeQuery(sql);
-
-			boolean exists = result.next();
-
-			if (!exists) {
-				System.out.println("No such Order ID exists in the database.");
-			}
-
-			stm.close();
-			result.close();
-
-			return exists;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public boolean checkBook(int book_id) {
-		try {
-			Statement stm = conn.createStatement();
-
-			String sql = "SELECT * FROM Book WHERE book_id = " + book_id;
-
-			System.out.println(sql);
-
-			ResultSet result = stm.executeQuery(sql);
-
-			boolean exists = result.next();
-
-			stm.close();
-			result.close();
-
-			return exists;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public int askBookId() {
-		int book_id = -1;
-		boolean valid_id = false;
-
-		while (!valid_id) {
-			System.out.print("Enter book ID (or -1 to exit): ");
-			book_id = in.nextInt();
-			in.nextLine(); // consume the remaining newline character
-
-			if (book_id == -1) {
-				return -1; // Return -1 to indicate program exit
-			} else if (checkBook(book_id)) {
-				valid_id = true;
-			} else {
-				System.out.println("Invalid book ID.");
-			}
-		}
-
-		return book_id;
 	}
 
 	/**
@@ -847,6 +778,87 @@ public class FlightManager {
 		}
 	}
 
+	/*
+	 * Check if the order ID exists in the database.
+	 */
+	public boolean checkOrder(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Orders WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			if (!exists) {
+				System.out.println("No such Order ID exists in the database.");
+			}
+
+			stm.close();
+			result.close();
+
+			return exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/*
+	 * Check if the book ID exists in the database.
+	 */
+	public boolean checkBook(int book_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Book WHERE book_id = " + book_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			stm.close();
+			result.close();
+
+			return exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/*
+	 * Ask to enter a book ID.
+	 */
+	public int askBookId() {
+		int book_id = -1;
+		boolean valid_id = false;
+
+		while (!valid_id) {
+			System.out.print("Enter book ID (or -1 to exit): ");
+			book_id = in.nextInt();
+			in.nextLine(); // consume the remaining newline character
+
+			if (book_id == -1) {
+				return -1; // Return -1 to indicate program exit
+			} else if (checkBook(book_id)) {
+				valid_id = true;
+			} else {
+				System.out.println("Invalid book ID.");
+			}
+		}
+
+		return book_id;
+	}
+
+	/*
+	 * Ask to enter a book amount.
+	 */
 	int getAmount(int book_id) {
 
 		int result = 0;
@@ -877,6 +889,9 @@ public class FlightManager {
 		return result;
 	}
 
+	/*
+	 * Get the discount of a student.
+	 */
 	double getDiscount(int student_id) {
 
 		double result = 0;
@@ -906,6 +921,9 @@ public class FlightManager {
 		return result;
 	}
 
+	/*
+	 * Get the price of a book.
+	 */
 	double getPriceByID(int book_id) {
 
 		double result = 0;
@@ -936,6 +954,9 @@ public class FlightManager {
 
 	}
 
+	/*
+	 * Get the payment information.
+	 */
 	private String[] getPaymentInfo() {
 		String[] result = new String[2];
 		// Define payment options
@@ -961,6 +982,8 @@ public class FlightManager {
 				break;
 			case 3:
 				paymentMethod = "Credit Card";
+
+				// !! If payment method is credit card, prompt for card number
 				break;
 			default:
 				System.out.println("Invalid payment option selected.");
