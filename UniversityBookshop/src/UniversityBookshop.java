@@ -49,12 +49,15 @@ public class UniversityBookshop {
 	// JDBC connecting port
 	int jdbcPort;
 
-	String[] options = { // if you want to add an option, append to the end of
-							// this array
-			"Search Order by OrderID", "Search Order by StudentID", "Place an Order", "Cancel an Order",
-			"Show All Books",
-			"Show All Orders",
-			"Exit" };
+	String[] options = {
+			"🔍 Search Order by OrderID",
+			"🔍👩‍💻 Search Order by StudentID", // changed to student emoji
+			"🛍️ Place an Order",
+			"🗑️ Cancel an Order",
+			"📚 Show All Books",
+			"📋 Show All Orders",
+			"Exit"
+	};
 
 	/**
 	 * Get YES or NO. Do not change this function.
@@ -307,7 +310,8 @@ public class UniversityBookshop {
 				return;
 			}
 
-			String[] heads = { "order_id", "student_id", "order_date", "total_price", "payment_method", "card_no" };
+			String[] heads = { "order_id", "student_id", "order_date", "total_price", "💳 payment_method",
+					"card_no" };
 
 			while (exists) {
 				for (int i = 0; i < 6; i++) {
@@ -336,7 +340,7 @@ public class UniversityBookshop {
 						default:
 							break;
 					}
-					System.out.println(heads[i] + " : " + result);
+					System.out.println("➖" + heads[i] + " : " + result);
 				}
 				exists = rs.next();
 			}
@@ -369,7 +373,7 @@ public class UniversityBookshop {
 			while (rs.next()) { // this is the result record iterator, see the
 
 				diplayBook(rs.getInt(1));
-				System.out.println("============================================");
+				System.out.println("📚============================================📚");
 				//
 			}
 			rs.close();
@@ -394,11 +398,10 @@ public class UniversityBookshop {
 			while (rs.next()) { // this is the result record iterator, see the
 
 				String[] heads = { "book_id", "title", "author", "price", "amount" };
+
 				for (int i = 0; i < 5; ++i) {
 					try {
-						// result = rs.getString(i + 1);
 						System.out.println(heads[i] + " : " + rs.getString(i + 1));
-						// System.out.print(result);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -428,7 +431,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "total_price" };
+			String[] heads = { " 🧳 total_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getDouble(i + 1);
@@ -578,7 +581,7 @@ public class UniversityBookshop {
 
 		System.out.println("Order ID: " + order_id);
 
-		System.out.println("Here are our Books:");
+		System.out.println("👋 Welcome to our bookshop! Here are our Books: ");
 
 		displayBooks();
 
@@ -871,7 +874,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "amount" };
+			String[] heads = { "📖 amount" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getInt(i + 1);
@@ -903,7 +906,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "discount" };
+			String[] heads = { "💸💸💸discount" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getDouble(i + 1);
@@ -935,7 +938,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "book_price" };
+			String[] heads = { "📖 book_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getDouble(i + 1);
