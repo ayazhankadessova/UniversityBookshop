@@ -108,7 +108,7 @@ public class FlightManager {
 			String[] namePwd = getUsernamePassword("Login cs lab computer");
 			String sshUser = namePwd[0];
 			String sshPwd = namePwd[1];
-			try {
+			try 
 				proxySession = new JSch().getSession(sshUser, proxyHost, proxyPort);
 				proxySession.setPassword(sshPwd);
 				Properties config = new Properties();
@@ -123,11 +123,12 @@ public class FlightManager {
 			}
 			jdbcHost = forwardHost;
 			jdbcPort = forwardPort;
-		} else {
-			jdbcHost = databaseHost;
-			jdbcPort = databasePort;
-		}
-		return true;
+		}else
+
+	{
+		jdbcHost = databaseHost;
+		jdbcPort = databasePort;
+	}return true;
 	}
 
 	/**
@@ -207,37 +208,6 @@ public class FlightManager {
 			}
 		}
 	}
-
-	/**
-	 * Print out the infomation of a flight given a flight_no
-	 * 
-	 * @param student_id
-	 */
-	// private void printFlightInfo(String flight_no) {
-	// try {
-	// Statement stm = conn.createStatement();
-	// String sql = "SELECT * FROM FLIGHTS WHERE Flight_no = '" + flight_no + "'";
-	// ResultSet rs = stm.executeQuery(sql);
-	// if (!rs.next())
-	// return;
-	// String[] heads = { "Flight_no", "Depart_Time", "Arrive_Time", "Fare",
-	// "Source", "Dest" };
-	// for (int i = 0; i < 6; ++i) { // flight table 6 attributes
-	// try {
-	// System.out.println(heads[i] + " : " + rs.getString(i + 1)); // attribute
-	// // id
-	// // starts
-	// // with
-	// // 1
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// } catch (SQLException e1) {
-	// e1.printStackTrace();
-	// noException = false;
-	// }
-	// }
 
 	private void orderSearch(String student_id) {
 		try {
@@ -362,80 +332,6 @@ public class FlightManager {
 		}
 	}
 
-	/**
-	 * Given source and dest, select all the flights can arrive the dest in one
-	 * stop. For example, given HK, Tokyo, you may find HK -> Beijing, Beijing
-	 * -> Tokyo Your job to fill in this function.
-	 */
-	private void selectFlightsInOneStop() {
-		System.out.println("Please input source, dest:");
-
-		String line = in.nextLine();
-
-		if (line.equalsIgnoreCase("exit"))
-			return;
-
-		String[] values = line.split(",");
-		for (int i = 0; i < values.length; ++i)
-			values[i] = values[i].trim();
-
-		try {
-			/**
-			 * Create the statement and sql
-			 */
-			Statement stm = conn.createStatement();
-
-			String sql = "select F1.Flight_no, F2.Flight_no from Flights F1, Flights F2 where F1.Source = '" + values[0]
-					+ "' AND F1.Dest = F2.Source AND F2.Dest = '" + values[1]
-					+ "' and F1.Arrive_time <= F2.Depart_time";
-
-			/**
-			 * Formulate your own SQL query:
-			 *
-			 * sql = "...";
-			 *
-			 */
-			System.out.println(sql);
-			//
-			ResultSet rs = stm.executeQuery(sql);
-
-			int resultCount = 0; // a counter to count the number of result
-			// // records
-			while (rs.next()) { // this is the result record iterator, see the
-				// // tutorial for details
-				//
-				// /*
-				// * Write your own to print flight information; you may use the
-				// * printFlightInfo() function
-				// */
-
-				// printFlightInfo(rs.getString(1));
-				System.out.println("--------------------------------------------");
-				// printFlightInfo(rs.getString(2));
-				++resultCount;
-				// System.out.println("============================================");
-				//
-			}
-			System.out.println("Total " + resultCount + " choice(s).");
-			rs.close();
-			stm.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			noException = false;
-		}
-
-		/**
-		 * try {
-		 * 
-		 * // Similar to the 'selectFlightsInZeroStop' function; write your own
-		 * code here
-		 * 
-		 * 
-		 * } catch (SQLException e) { e.printStackTrace(); noException = false;
-		 * }
-		 */
-	}
-
 	public int getTotalById(int order_id) {
 
 		int result = 0;
@@ -451,8 +347,8 @@ public class FlightManager {
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getInt(i + 1);
-					System.out.println(heads[i] + " : ");
-					System.out.print(result);
+					System.out.println(heads[i] + " : " + result);
+					// System.out.print(result);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -497,11 +393,11 @@ public class FlightManager {
 
 			stm.close();
 
-			System.out.println("succeed to update order " + order_id);
+			System.out.println("succeed to update discount for student " + student_id);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("Could not update " + order_id);
+			System.out.println("Could not update discount for student " + student_id);
 			noException = false;
 		}
 	}
@@ -513,8 +409,7 @@ public class FlightManager {
 	 */
 	private void placeorder() {
 		/**
-		 * A sample input is: CX109, 2015/03/15/13:00:00, 2015/03/15/19:00:00,
-		 * 2000, Beijing, Tokyo
+		 * A sample input is:
 		 */
 		System.out.println("Please input student-id or exit:");
 		String line = in.nextLine();
@@ -542,47 +437,89 @@ public class FlightManager {
 		// Loop through the number of different books and prompt the user to enter the
 		// book ID and amount for each book
 		for (int i = 1; i <= numBooks; i++) {
-			System.out.println("Enter information for book " + i + ":");
+			System.out.println("Enter information for book " + i + "....");
 
 			// Prompt the user to enter the book ID
 			System.out.print("Book ID: ");
+
 			// if already in order
 			int bookId = in.nextInt();
 			in.nextLine(); // consume the remaining newline character
 
 			// Check if the book ID is already in the order
 			if (addedBookIds.contains(bookId)) {
-				System.out.println("This book is already in your order. Please enter a different book ID.");
-				i--; // decrement i to repeat this iteration
-				continue;
-			}
+				System.out.println("This book is already in your order. Do you want to change the amount? (y/n)");
 
-			// Prompt the user to enter the book amount
-			System.out.print("Book amount: ");
-			int bookAmount = in.nextInt();
-			in.nextLine(); // consume the remaining newline character
+				String answer = in.nextLine();
+				if (answer.equalsIgnoreCase("y")) {
+					int oldAmount = 0;
+					for (int j = 0; i < orders.size(); i++) {
+						if (orders.get(i).getBookId() == bookId) {
+							oldAmount = orders.get(i).getBookAmount();
+							break;
+						}
+					}
 
-			// Check if there is enough stock of the book
-			if (bookAmount > getAmount(bookId)) {
-				System.out.println("We don't have enough stock of this book. Sorry!");
-				continue;
+					System.out.print("New book amount: ");
+					int newAmount = in.nextInt();
+					in.nextLine(); // consume the remaining newline character
+
+					// Check if there is enough stock of the book
+					if (newAmount > getAmount(bookId)) {
+						System.out.println("We don't have enough stock of this book. Sorry!");
+						continue;
+					} else {
+						// Update the amount of the book in the order
+						for (BookOrder order : orders) {
+							if (order.getBookId() == bookId) {
+								order.bookAmount = newAmount;
+								break;
+							}
+						}
+
+						// Get the price of the book by ID from the database
+						double book_price = getPriceByID(bookId);
+
+						// Calculate the total price difference for this book
+						double book_total_price_diff = (newAmount * book_price) - (oldAmount * book_price);
+
+						// Add the total price difference for this book to the overall total price
+						total_price += book_total_price_diff;
+
+						counter++;
+					}
+				} else {
+					continue;
+				}
 			} else {
-				// Record the successful book order
-				BookOrder order = new BookOrder(bookId, bookAmount);
-				orders.add(order);
-				addedBookIds.add(bookId); // add the book ID to the set of added book IDs
 
-				// Get the price of the book by ID from the database
-				double book_price = getPriceByID(bookId);
+				// Prompt the user to enter the book amount
+				System.out.print("Book amount: ");
+				int bookAmount = in.nextInt();
+				in.nextLine(); // consume the remaining newline character
 
-				// Calculate the total price for this book
-				double book_total_price = bookAmount * book_price;
+				// Check if there is enough stock of the book
+				if (bookAmount > getAmount(bookId)) {
+					System.out.println("We don't have enough stock of this book. Sorry!");
+					continue;
+				} else {
+					// Record the successful book order
+					BookOrder order = new BookOrder(bookId, bookAmount);
+					orders.add(order);
+					addedBookIds.add(bookId); // add the book ID to the set of added book IDs
 
-				// Add the total price for this book to the overall total price
-				total_price += book_total_price;
+					// Get the price of the book by ID from the database
+					double book_price = getPriceByID(bookId);
 
-				counter++;
+					// Calculate the total price for this book
+					double book_total_price = bookAmount * book_price;
 
+					// Add the total price for this book to the overall total price
+					total_price += book_total_price;
+
+					counter++;
+
+				}
 			}
 		}
 
@@ -608,7 +545,7 @@ public class FlightManager {
 				try {
 					// Insert the order details into the Orders table
 					insertOrder(order_id, student_id, total_price, payment_method);
-					System.out.println("Success! I will add info for every book now");
+					System.out.println("Success! I will add info for every book now...");
 
 					// Loop through the book orders and insert the details into the Order_Details
 					// table
