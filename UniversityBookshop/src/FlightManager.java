@@ -224,15 +224,18 @@ public class FlightManager {
 			Statement stm = conn.createStatement();
 			String sql = "SELECT order_id FROM Orders WHERE Student_id =" + student_id;
 			ResultSet rs = stm.executeQuery(sql);
-			if (!rs.next()) {
-				System.out.println("No order found");
+
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
 				return;
 			}
 
-			while (rs.next()) { // this is the result record iterator, see the
+			while (exists) { // this is the result record iterator, see the
 
 				orderSearchbyID(rs.getInt(1));
 				System.out.println("============================================");
+				exists = rs.next();
 
 			}
 			rs.close();
@@ -319,27 +322,41 @@ public class FlightManager {
 				return;
 			}
 
-			while (rs.next()) {
-				String[] heads = { "order_id", "student_id", "order_date", "total_price", "payment_m", "card_no" };
-				for (int i = 0; i < 6; ++i) {
-					try {
-						String result = "";
-						if (heads[i].equals("order_id") || heads[i].equals("student_id")) {
-							result = Integer.toString(rs.getInt(i + 1));
-						} else if (heads[i].equals("order_date")) {
-							result = rs.getDate(i + 1).toString();
-						} else if (heads[i].equals("total_price")) {
-							result = Double.toString(rs.getDouble(i + 1));
-						} else {
-							result = rs.getString(i + 1);
-						}
-						System.out.println(heads[i] + " : " + result);
-					} catch (SQLException e) {
-						e.printStackTrace();
+			String[] heads = { "order_id", "student_id", "order_date", "total_price", "payment_method", "card_no" };
+
+			while (exists) {
+				for (int i = 0; i < 6; i++) {
+					String result = "";
+					switch (heads[i]) {
+						case "order_id":
+						case "student_id":
+							result = Integer.toString(rs.getInt(heads[i]));
+							break;
+						case "order_date":
+							result = rs.getDate(heads[i]).toString();
+							break;
+						case "total_price":
+							result = String.format("%.2f", rs.getBigDecimal(heads[i]));
+							break;
+						case "payment_method":
+							result = rs.getString(heads[i]);
+							break;
+						case "card_no":
+							if (rs.getString(heads[i]) == null) {
+								result = "N/A";
+							} else {
+								result = rs.getString(heads[i]);
+							}
+							break;
+						default:
+							break;
 					}
+					System.out.println(heads[i] + " : " + result);
 				}
 				System.out.println("============================================");
+				exists = rs.next();
 			}
+
 			rs.close();
 			stm.close();
 		} catch (SQLException e) {
@@ -521,7 +538,7 @@ public class FlightManager {
 			boolean exists = result.next();
 
 			if (!exists) {
-				System.out.println("No such book");
+				System.out.println("No such Student ID exists in the database.");
 			}
 
 			stm.close();
@@ -545,6 +562,10 @@ public class FlightManager {
 			ResultSet result = stm.executeQuery(sql);
 
 			boolean exists = result.next();
+
+			if (!exists) {
+				System.out.println("No such Order ID exists in the database.");
+			}
 
 			stm.close();
 			result.close();
