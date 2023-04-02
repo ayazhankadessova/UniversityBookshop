@@ -10,17 +10,17 @@ COMMIT;
 
 CREATE TABLE Book (
     book_id INT,
-    title VARCHAR(50) NOT NULL,
-    author CHAR(50) NOT NULL,
+    title VARCHAR(30) NOT NULL,
+    author CHAR(30) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     amount INT NOT NULL,
     PRIMARY KEY (book_id));
 
 CREATE TABLE Student (
     student_id INT,
-    name VARCHAR(50) NOT NULL,
-    gender VARCHAR(50) NOT NULL,
-    major VARCHAR(50) NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    gender VARCHAR(30) NOT NULL,
+    major VARCHAR(30) NOT NULL,
     discount DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (student_id)
 );
@@ -182,20 +182,11 @@ END;
 CREATE OR REPLACE TRIGGER check_credit_card
 BEFORE INSERT ON Orders
 FOR EACH ROW
-DECLARE
-  student_discount DECIMAL(10,2);
 BEGIN
   -- Check if payment method is credit card and card number is valid
   IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
     -- Raise an error if the card number is not valid
     RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
-  END IF;
-
-  -- Update total_price based on student discount
-  SELECT discount INTO student_discount FROM Student WHERE student_id = :NEW.student_id;
-
-  IF student_discount IS NOT NULL THEN
-    :NEW.total_price := :NEW.total_price * (1 - student_discount);
   END IF;
 END;
 /
