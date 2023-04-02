@@ -1,4 +1,5 @@
 import java.awt.GridLayout;
+import java.util.*;
 import java.awt.TextField;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -50,7 +51,7 @@ public class FlightManager {
 
 	String[] options = { // if you want to add an option, append to the end of
 							// this array
-			"order searchs", "order place", "order cancel",
+			"order search", "order place", "order cancel",
 			"exit" };
 
 	/**
@@ -135,11 +136,11 @@ public class FlightManager {
 	 * @return boolean
 	 */
 	public boolean loginDB() {
-		String username = "f1204276";//Replace e1234567 to your username
-		String password = "f1204276";//Replace e1234567 to your password
-		
+		String username = "f1204276";// Replace e1234567 to your username
+		String password = "f1204276";// Replace e1234567 to your password
+
 		/* Do not change the code below */
-		if(username.equalsIgnoreCase("e1234567") || password.equalsIgnoreCase("e1234567")) {
+		if (username.equalsIgnoreCase("e1234567") || password.equalsIgnoreCase("e1234567")) {
 			String[] namePwd = getUsernamePassword("Login sqlplus");
 			username = namePwd[0];
 			password = namePwd[1];
@@ -189,16 +190,18 @@ public class FlightManager {
 			}
 			if (choice == 1) {
 				// ordersearch()
-//				addFlight();
+				// addFlight();
 			} else if (choice == 2) {
 				placeorder();
 			} else if (choice == 3) {
 				// cancelorder()
 				printFlightByNo();
-//			} else if (options[choice - 1].equals("select a flight (by source, dest, stop_no = 0)")) {
-//				selectFlightsInZeroStop();
-//			} else if (options[choice - 1].equals("select a flight (by source, dest, stop_no = 1)")) {
-//				selectFlightsInOneStop();
+				// } else if (options[choice - 1].equals("select a flight (by source, dest,
+				// stop_no = 0)")) {
+				// selectFlightsInZeroStop();
+				// } else if (options[choice - 1].equals("select a flight (by source, dest,
+				// stop_no = 1)")) {
+				// selectFlightsInOneStop();
 			} else if (options[choice - 1].equals("exit")) {
 				break;
 			}
@@ -210,31 +213,32 @@ public class FlightManager {
 	 * 
 	 * @param student_id
 	 */
-//	private void printFlightInfo(String flight_no) {
-//		try {
-//			Statement stm = conn.createStatement();
-//			String sql = "SELECT * FROM FLIGHTS WHERE Flight_no = '" + flight_no + "'";
-//			ResultSet rs = stm.executeQuery(sql);
-//			if (!rs.next())
-//				return;
-//			String[] heads = { "Flight_no", "Depart_Time", "Arrive_Time", "Fare", "Source", "Dest" };
-//			for (int i = 0; i < 6; ++i) { // flight table 6 attributes
-//				try {
-//					System.out.println(heads[i] + " : " + rs.getString(i + 1)); // attribute
-//																				// id
-//																				// starts
-//																				// with
-//																				// 1
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		} catch (SQLException e1) {
-//			e1.printStackTrace();
-//			noException = false;
-//		}
-//	}
-	
+	// private void printFlightInfo(String flight_no) {
+	// try {
+	// Statement stm = conn.createStatement();
+	// String sql = "SELECT * FROM FLIGHTS WHERE Flight_no = '" + flight_no + "'";
+	// ResultSet rs = stm.executeQuery(sql);
+	// if (!rs.next())
+	// return;
+	// String[] heads = { "Flight_no", "Depart_Time", "Arrive_Time", "Fare",
+	// "Source", "Dest" };
+	// for (int i = 0; i < 6; ++i) { // flight table 6 attributes
+	// try {
+	// System.out.println(heads[i] + " : " + rs.getString(i + 1)); // attribute
+	// // id
+	// // starts
+	// // with
+	// // 1
+	// } catch (SQLException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// } catch (SQLException e1) {
+	// e1.printStackTrace();
+	// noException = false;
+	// }
+	// }
+
 	private void orderSearch(String student_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -295,7 +299,7 @@ public class FlightManager {
 		if (line.equalsIgnoreCase("exit"))
 			return;
 
-//		printFlightInfo(line);
+		// printFlightInfo(line);
 	}
 
 	/**
@@ -321,8 +325,8 @@ public class FlightManager {
 			 */
 			Statement stm = conn.createStatement();
 
-			String sql = "select Flight_no from Flights where Source = '" + values[0] + "' AND Dest = '" + values[1] + "'";
-			
+			String sql = "select Flight_no from Flights where Source = '" + values[0] + "' AND Dest = '" + values[1]
+					+ "'";
 
 			/**
 			 * Formulate your own SQL query:
@@ -331,23 +335,23 @@ public class FlightManager {
 			 *
 			 */
 			System.out.println(sql);
-//
+			//
 			ResultSet rs = stm.executeQuery(sql);
 
 			int resultCount = 0; // a counter to count the number of result
-//									// records
+			// // records
 			while (rs.next()) { // this is the result record iterator, see the
-//								// tutorial for details
-//
-//				/*
-//				 * Write your own to print flight information; you may use the
-//				 * printFlightInfo() function
-//				 */
-				
-//				printFlightInfo(rs.getString(1));
+				// // tutorial for details
+				//
+				// /*
+				// * Write your own to print flight information; you may use the
+				// * printFlightInfo() function
+				// */
+
+				// printFlightInfo(rs.getString(1));
 				++resultCount;
 				System.out.println("============================================");
-//
+				//
 			}
 			System.out.println("Total " + resultCount + " choice(s).");
 			rs.close();
@@ -374,18 +378,16 @@ public class FlightManager {
 		String[] values = line.split(",");
 		for (int i = 0; i < values.length; ++i)
 			values[i] = values[i].trim();
-		
-		
+
 		try {
 			/**
 			 * Create the statement and sql
 			 */
 			Statement stm = conn.createStatement();
 
-//			String sql = "select Flight_no from Flights where Source = '" + values[0] + "' AND Dest = '" + values[1] + "'";
-			
-			String sql = "select F1.Flight_no, F2.Flight_no from Flights F1, Flights F2 where F1.Source = '" + values[0] + "' AND F1.Dest = F2.Source AND F2.Dest = '" + values[1] + "' and F1.Arrive_time <= F2.Depart_time";
-			
+			String sql = "select F1.Flight_no, F2.Flight_no from Flights F1, Flights F2 where F1.Source = '" + values[0]
+					+ "' AND F1.Dest = F2.Source AND F2.Dest = '" + values[1]
+					+ "' and F1.Arrive_time <= F2.Depart_time";
 
 			/**
 			 * Formulate your own SQL query:
@@ -394,25 +396,25 @@ public class FlightManager {
 			 *
 			 */
 			System.out.println(sql);
-//
+			//
 			ResultSet rs = stm.executeQuery(sql);
 
 			int resultCount = 0; // a counter to count the number of result
-//									// records
+			// // records
 			while (rs.next()) { // this is the result record iterator, see the
-//								// tutorial for details
-//
-//				/*
-//				 * Write your own to print flight information; you may use the
-//				 * printFlightInfo() function
-//				 */
-				
-//				printFlightInfo(rs.getString(1));
+				// // tutorial for details
+				//
+				// /*
+				// * Write your own to print flight information; you may use the
+				// * printFlightInfo() function
+				// */
+
+				// printFlightInfo(rs.getString(1));
 				System.out.println("--------------------------------------------");
-//				printFlightInfo(rs.getString(2));
+				// printFlightInfo(rs.getString(2));
 				++resultCount;
-//				System.out.println("============================================");
-//
+				// System.out.println("============================================");
+				//
 			}
 			System.out.println("Total " + resultCount + " choice(s).");
 			rs.close();
@@ -421,8 +423,6 @@ public class FlightManager {
 			e.printStackTrace();
 			noException = false;
 		}
-		
-		
 
 		/**
 		 * try {
@@ -436,6 +436,76 @@ public class FlightManager {
 		 */
 	}
 
+	public int getTotalById(int order_id) {
+
+		int result = 0;
+
+		try {
+
+			Statement stm = conn.createStatement();
+			String sql = "SELECT total_price FROM Orders WHERE order_id = " + order_id + ";";
+			ResultSet rs = stm.executeQuery(sql);
+			if (!rs.next())
+				return 0;
+			String[] heads = { "total_price" };
+			for (int i = 0; i < 1; ++i) {
+				try {
+					result = rs.getInt(i + 1);
+					System.out.println(heads[i] + " : ");
+					System.out.print(result);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			noException = false;
+		}
+
+		return result;
+
+	}
+
+	public void updateDiscount(int student_id) {
+
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "UPDATE Student\n" +
+					"SET discount = (\n" +
+					"  CASE\n" +
+					"    WHEN (\n" +
+					"      SELECT SUM(total_price)\n" +
+					"      FROM Orders\n" +
+					"      WHERE student_id = " + student_id + "\n" +
+					"      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
+					"    ) > 2000 THEN 0.20\n" +
+					"    WHEN (\n" +
+					"      SELECT SUM(total_price)\n" +
+					"      FROM Orders\n" +
+					"      WHERE student_id = " + student_id + "\n" +
+					"      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
+					"    ) > 1000 THEN 0.10\n" +
+					"    ELSE 0\n" +
+					"  END\n" +
+					")\n" +
+					"WHERE student_id = " + student_id + ";";
+
+			System.out.println(sql);
+
+			stm.executeUpdate(sql);
+
+			stm.close();
+
+			System.out.println("succeed to update order " + order_id);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Could not update " + order_id);
+			noException = false;
+		}
+	}
+
 	/**
 	 * Insert data into database
 	 * 
@@ -447,54 +517,320 @@ public class FlightManager {
 		 * 2000, Beijing, Tokyo
 		 */
 		System.out.println("Please input student-id or exit:");
-		String student_id = in.nextLine();
-		
-		if (student_id.equalsIgnoreCase("exit"))
+		String line = in.nextLine();
+
+		if (line.equalsIgnoreCase("exit"))
 			return;
-		
+
+		int student_id = Integer.parseInt(line);
+
 		System.out.println("Please input order-id:");
-		String order_id = in.nextLine();
-		
+		int order_id = Integer.parseInt(in.nextLine());
+
 		// Prompt the user to enter the number of different books to order
-        System.out.print("How many different books would you like to order? ");
-        int numBooks = in.nextInt();
-        in.nextLine(); // consume the remaining newline character
-        
-        try {
-        // Loop through the number of different books and prompt the user to enter the book ID and amount for each book
-        for (int i = 1; i <= numBooks; i++) {
-            System.out.println("Enter information for book " + i + ":");
-            
-            // Prompt the user to enter the book ID
-            System.out.print("Book ID: ");
-            int bookId = in.nextInt();
-            in.nextLine(); // consume the remaining newline character
-            
-            // Prompt the user to enter the book amount
-            System.out.print("Book amount: ");
-            int bookAmount = in.nextInt();
-            in.nextLine(); // consume the remaining newline character
-            
-            // Print out the entered values
-            System.out.println("Book " + i + " - ID: " + bookId + ", Amount: " + bookAmount);
-       
-		
+		System.out.print("How many different books would you like to order? ");
+		int numBooks = in.nextInt();
+		in.nextLine(); // consume the remaining newline character
+
+		int counter = 0;
+		double total_price = 0;
+
+		// Create an ArrayList to record successful book orders
+		ArrayList<BookOrder> orders = new ArrayList<>();
+		HashSet<Integer> addedBookIds = new HashSet<>();
+
+		// Loop through the number of different books and prompt the user to enter the
+		// book ID and amount for each book
+		for (int i = 1; i <= numBooks; i++) {
+			System.out.println("Enter information for book " + i + ":");
+
+			// Prompt the user to enter the book ID
+			System.out.print("Book ID: ");
+			// if already in order
+			int bookId = in.nextInt();
+			in.nextLine(); // consume the remaining newline character
+
+			// Check if the book ID is already in the order
+			if (addedBookIds.contains(bookId)) {
+				System.out.println("This book is already in your order. Please enter a different book ID.");
+				i--; // decrement i to repeat this iteration
+				continue;
+			}
+
+			// Prompt the user to enter the book amount
+			System.out.print("Book amount: ");
+			int bookAmount = in.nextInt();
+			in.nextLine(); // consume the remaining newline character
+
+			// Check if there is enough stock of the book
+			if (bookAmount > getAmount(bookId)) {
+				System.out.println("We don't have enough stock of this book. Sorry!");
+				continue;
+			} else {
+				// Record the successful book order
+				BookOrder order = new BookOrder(bookId, bookAmount);
+				orders.add(order);
+				addedBookIds.add(bookId); // add the book ID to the set of added book IDs
+
+				// Get the price of the book by ID from the database
+				double book_price = getPriceByID(bookId);
+
+				// Calculate the total price for this book
+				double book_total_price = bookAmount * book_price;
+
+				// Add the total price for this book to the overall total price
+				total_price += book_total_price;
+
+				counter++;
+
+			}
+		}
+
+		if (counter > 0) {
+			// updateTotal(order_id, student_id);
+			// total_price = getTotalById(order_id);
+
+			double discount = getDiscount(student_id);
+			total_price = total_price * (1 - discount);
+
+			System.out.println("Your total is... " + total_price);
+			// Ask if the user wants to pay
+			System.out.println("Do you want to proceed with payment? (Y/N)");
+			String answer = in.nextLine();
+
+			// Check the answer
+			if (answer.equalsIgnoreCase("Y")) {
+				// Proceed with payment
+				String[] payment_result = getPaymentInfo();
+				String payment_method = payment_result[0];
+				String card_no = payment_result[1];
+
+				try {
+					// Insert the order details into the Orders table
+					insertOrder(order_id, student_id, total_price, payment_method);
+					System.out.println("Success! I will add info for every book now");
+
+					// Loop through the book orders and insert the details into the Order_Details
+					// table
+					for (BookOrder order : orders) {
+						InsertBook(order_id, order.getBookId(), order.getBookAmount());
+					}
+
+					System.out.println("Success! All order information has been added.");
+				} catch (SQLException e) {
+					System.out.println("Error: " + e.getMessage());
+				}
+
+			} else {
+				// Cancel payment , cancel order
+			}
+
+			updateDiscount(student_id);
+		}
+
+	}
+
+	public void InsertBook(int order_id, int bookId, int bookAmount) throws SQLException {
+
+		try {
 			Statement stm = conn.createStatement();
-	
-			
-			String sql = "INSERT INTO Orders_Book VALUES (" + order_id + "," + bookId + "," + bookAmount + "," + "SYSDATE)";
-           
-			
-			stm.executeUpdate(sql);
+
+			String sql = "INSERT INTO Orders_Book VALUES (" + order_id + "," + bookId + "," + bookAmount + ","
+					+ "SYSDATE + INTERVAL '14' DAY)";
+
+			System.out.println(sql);
+
+			stm.executeUpdate(sql); // please pay attention that we use
+									// executeUpdate to update the database
+
 			stm.close();
-			System.out.println("succeed to add flight ");
-//			printFlightInfo(values[0]);
-        }
-        } catch (SQLException e) {
+
+			System.out.println("succeed to insert Order " + order_id);
+
+		} catch (SQLException e) {
 			e.printStackTrace();
-//			System.out.println("fail to add a flight " + line);
+			System.out.println("fail to Insert Book " + bookId);
+			noException = false;
+			// return "error";
+		}
+	}
+
+	public void insertOrder(int order_id, int student_id, double total_price, String payment_method)
+			throws SQLException {
+
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method) " +
+					"VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ", '" + payment_method
+					+ "')";
+			System.out.println(sql);
+
+			stm.executeUpdate(sql); // please pay attention that we use
+									// executeUpdate to update the database
+
+			stm.close();
+
+			System.out.println("succeed to insert Order " + order_id);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("fail to delete flight " + line);
+			noException = false;
+			// return "error";
+		}
+	}
+
+	double getAmount(int book_id) {
+
+		int result = 0;
+
+		try {
+
+			Statement stm = conn.createStatement();
+			String sql = "SELECT amount FROM Book WHERE book_id = " + book_id + ";";
+
+			ResultSet rs = stm.executeQuery(sql);
+			if (!rs.next())
+				return 0;
+			String[] heads = { "book_price" };
+			for (int i = 0; i < 1; ++i) {
+				try {
+					result = rs.getInt(i + 1);
+					System.out.println(heads[i] + " : ");
+					System.out.print(result);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 			noException = false;
 		}
+
+		return result;
+	}
+
+	double getDiscount(int student_id) {
+
+		double result = 0;
+
+		try {
+
+			Statement stm = conn.createStatement();
+			String sql = "SELECT discount FROM Student WHERE student_id = " + student_id + ";";
+			ResultSet rs = stm.executeQuery(sql);
+			if (!rs.next())
+				return 0;
+			String[] heads = { "book_price" };
+			for (int i = 0; i < 1; ++i) {
+				try {
+					result = rs.getInt(i + 1);
+					System.out.println(heads[i] + " : ");
+					System.out.print(result);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			noException = false;
+		}
+
+		return result;
+	}
+
+	double getPriceByID(int book_id) {
+
+		double result = 0;
+
+		try {
+
+			Statement stm = conn.createStatement();
+			String sql = "SELECT price FROM Book WHERE book_id = " + book_id + ";";
+			ResultSet rs = stm.executeQuery(sql);
+			if (!rs.next())
+				return 0;
+			String[] heads = { "book_price" };
+			for (int i = 0; i < 1; ++i) {
+				try {
+					result = rs.getInt(i + 1);
+					System.out.println(heads[i] + " : ");
+					System.out.print(result);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			noException = false;
+		}
+
+		return result;
+
+	}
+
+	private String[] getPaymentInfo() {
+		String[] result = new String[2];
+		// Define payment options
+		String[] paymentOptions = { "Apple Pay", "AliPay", "Credit Card" };
+
+		// Print payment options
+		System.out.println("Please choose a payment method:");
+		for (int i = 0; i < paymentOptions.length; i++) {
+			System.out.println((i + 1) + ". " + paymentOptions[i]);
+		}
+
+		// Read user input for payment method
+		int paymentOption = in.nextInt();
+		String paymentMethod;
+
+		// Assign payment method based on user input
+		switch (paymentOption) {
+			case 1:
+				paymentMethod = "Apple Pay";
+				break;
+			case 2:
+				paymentMethod = "AliPay";
+				break;
+			case 3:
+				paymentMethod = "Credit Card";
+				break;
+			default:
+				System.out.println("Invalid payment option selected.");
+				System.out.println("Do you want to select a valid payment option? (Y/N)");
+				String answer = in.next();
+				if (answer.equalsIgnoreCase("Y")) {
+					return getPaymentInfo(); // recursively call the method to get a valid payment option
+				} else {
+					return null; // user chose not to enter a valid payment option
+				}
+		}
+
+		String cardNumber = null;
+
+		if (paymentMethod.equalsIgnoreCase("Credit Card")) {
+			// If payment method is credit card, prompt for card number
+			System.out.print("Enter card number: ");
+			cardNumber = getCreditCard();
+			// Process credit card payment with the card number
+			System.out.println("Processing credit card payment with card number: " + cardNumber);
+		} else {
+			// Process non-credit card payment
+			System.out.println("Processing " + paymentMethod + " payment.");
+		}
+
+		result[0] = paymentMethod;
+		result[1] = cardNumber;
+
+		return result; // return the chosen payment method
+	}
+
+	private String getCreditCard() {
+		System.out.print("Enter card number: ");
+		String cardNumber = in.next();
+		System.out.println("Processing credit card payment with card number: " + cardNumber);
+		return cardNumber;
 	}
 
 	/**
@@ -512,8 +848,8 @@ public class FlightManager {
 		try {
 			Statement stm = conn.createStatement();
 
-			String sql = "Delete from FLIGHTS " + "Where Flight_no = '" + line + "'" ;
-			
+			String sql = "Delete from FLIGHTS " + "Where Flight_no = '" + line + "'";
+
 			System.out.println(sql);
 
 			/*
