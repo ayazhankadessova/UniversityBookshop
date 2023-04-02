@@ -98,7 +98,7 @@ public class FlightManager {
 		return new String[] { usernameField.getText(), new String(passwordField.getPassword()) };
 	}
 
-	/**
+	/*
 	 * Login the proxy. Do not change this function.
 	 * 
 	 * @return boolean
@@ -108,7 +108,7 @@ public class FlightManager {
 			String[] namePwd = getUsernamePassword("Login cs lab computer");
 			String sshUser = namePwd[0];
 			String sshPwd = namePwd[1];
-			try 
+			try {
 				proxySession = new JSch().getSession(sshUser, proxyHost, proxyPort);
 				proxySession.setPassword(sshPwd);
 				Properties config = new Properties();
@@ -123,12 +123,11 @@ public class FlightManager {
 			}
 			jdbcHost = forwardHost;
 			jdbcPort = forwardPort;
-		}else
-
-	{
-		jdbcHost = databaseHost;
-		jdbcPort = databasePort;
-	}return true;
+		} else {
+			jdbcHost = databaseHost;
+			jdbcPort = databasePort;
+		}
+		return true;
 	}
 
 	/**
@@ -220,10 +219,8 @@ public class FlightManager {
 			for (int i = 0; i < 6; ++i) { // flight table 6 attributes
 				try {
 					System.out.println(heads[i] + " : " + rs.getString(i + 1)); // attribute
-																				// id
-																				// starts
-																				// with
-																				// 1
+
+					// 1
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -332,21 +329,21 @@ public class FlightManager {
 		}
 	}
 
-	public int getTotalById(int order_id) {
+	public double getTotalById(int order_id) {
 
-		int result = 0;
+		double result = 0;
 
 		try {
 
 			Statement stm = conn.createStatement();
-			String sql = "SELECT total_price FROM Orders WHERE order_id = " + order_id + ";";
+			String sql = "SELECT total_price FROM Orders WHERE order_id = " + order_id;
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
 			String[] heads = { "total_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
-					result = rs.getInt(i + 1);
+					result = rs.getDouble(i + 1);
 					System.out.println(heads[i] + " : " + result);
 					// System.out.print(result);
 				} catch (SQLException e) {
@@ -385,7 +382,7 @@ public class FlightManager {
 					"    ELSE 0\n" +
 					"  END\n" +
 					")\n" +
-					"WHERE student_id = " + student_id + ";";
+					"WHERE student_id = " + student_id;
 
 			System.out.println(sql);
 
@@ -499,8 +496,9 @@ public class FlightManager {
 				in.nextLine(); // consume the remaining newline character
 
 				// Check if there is enough stock of the book
-				if (bookAmount > getAmount(bookId)) {
-					System.out.println("We don't have enough stock of this book. Sorry!");
+				int stock = getAmount(bookId);
+				if (bookAmount > stock) {
+					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock);
 					continue;
 				} else {
 					// Record the successful book order
@@ -612,30 +610,30 @@ public class FlightManager {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("fail to delete flight " + line);
+			System.out.println("fail to insert order " + order_id);
 			noException = false;
 			// return "error";
 		}
 	}
 
-	double getAmount(int book_id) {
+	int getAmount(int book_id) {
 
 		int result = 0;
 
 		try {
 
 			Statement stm = conn.createStatement();
-			String sql = "SELECT amount FROM Book WHERE book_id = " + book_id + ";";
+			String sql = "SELECT amount FROM Book WHERE book_id = " + book_id;
 
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "book_price" };
+			String[] heads = { "amount" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getInt(i + 1);
 					System.out.println(heads[i] + " : ");
-					System.out.print(result);
+					System.out.println(result);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -655,16 +653,16 @@ public class FlightManager {
 		try {
 
 			Statement stm = conn.createStatement();
-			String sql = "SELECT discount FROM Student WHERE student_id = " + student_id + ";";
+			String sql = "SELECT discount FROM Student WHERE student_id = " + student_id;
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "book_price" };
+			String[] heads = { "discount" };
 			for (int i = 0; i < 1; ++i) {
 				try {
-					result = rs.getInt(i + 1);
+					result = rs.getDouble(i + 1);
 					System.out.println(heads[i] + " : ");
-					System.out.print(result);
+					System.out.println(result);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -684,16 +682,16 @@ public class FlightManager {
 		try {
 
 			Statement stm = conn.createStatement();
-			String sql = "SELECT price FROM Book WHERE book_id = " + book_id + ";";
+			String sql = "SELECT price FROM Book WHERE book_id = " + book_id;
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
 			String[] heads = { "book_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
-					result = rs.getInt(i + 1);
+					result = rs.getDouble(i + 1);
 					System.out.println(heads[i] + " : ");
-					System.out.print(result);
+					System.out.println(result);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
