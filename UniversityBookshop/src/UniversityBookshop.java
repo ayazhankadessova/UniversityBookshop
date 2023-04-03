@@ -177,6 +177,9 @@ public class UniversityBookshop {
 	 * Run the manager
 	 */
 	public void run() {
+
+		// update everytime program starts
+		update();
 		while (noException) {
 			showOptions();
 			String line = in.nextLine();
@@ -261,6 +264,38 @@ public class UniversityBookshop {
 		}
 	}
 
+	public boolean outstandingOrderSearchbyStudentID(int student_id) {
+		try {
+			Statement stm = conn.createStatement();
+			String sql = "SELECT order_id FROM Orders WHERE student_id = " + student_id
+					+ " AND order_delivered = false";
+			ResultSet rs = stm.executeQuery(sql);
+
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
+				return false;
+			}
+
+			while (exists) { // this is the result record iterator, see the
+
+				orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+				exists = rs.next();
+
+			}
+			rs.close();
+			stm.close();
+
+			return true;
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			noException = false;
+			return false;
+
+		}
+	}
+
 	/**
 	 * List all Orders in the database.
 	 */
@@ -311,10 +346,10 @@ public class UniversityBookshop {
 			}
 
 			String[] heads = { "order_id", "student_id", "order_date", "total_price", "💳 payment_method",
-					"card_no" };
+					"card_no", "delivered" };
 
 			while (exists) {
-				for (int i = 0; i < 6; i++) {
+				for (int i = 0; i < 7; i++) {
 					String result = "";
 					switch (heads[i]) {
 						case "order_id":
@@ -329,6 +364,9 @@ public class UniversityBookshop {
 							break;
 						case "payment_method":
 							result = rs.getString(heads[i]);
+							break;
+						case "delivered":
+							result = rs.getBoolean(heads[i]) ? "Yes" : "No";
 							break;
 						case "card_no":
 							if (rs.getString(heads[i]) == null) {
@@ -554,6 +592,85 @@ public class UniversityBookshop {
 		}
 	}
 
+	public boolean allDelivered(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Orders_Book WHERE delivery_date > SYSDATE AND order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			if (exists) {
+				System.out.println("There are still pending orders.");
+			}
+
+			stm.close();
+			result.close();
+
+			return !exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public void updateOrder(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			if (allDelivered(order_id)) {
+				System.out.println("All books in order " + order_id + " have been delivered.");
+			} else {
+				System.out.println("There are still pending orders.");
+				return;
+			}
+
+			String sql = "UPDATE Orders SET order_delivered = true WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			stm.executeUpdate(sql);
+
+			stm.close();
+
+			System.out.println("succeed to update order " + order_id);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Could not update order " + order_id);
+			noException = false;
+		}
+	}
+
+	public void update() {
+
+		System.out.println("All orders in the database now:");
+		try {
+			Statement stm = conn.createStatement();
+			String sql = "SELECT order_id FROM Orders";
+			System.out.println(sql);
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			while (rs.next()) { // this is the result record iterator, see the
+
+				updateOrder(rs.getInt(1));
+				System.out.println("============================================");
+
+			}
+			rs.close();
+			stm.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			noException = false;
+		}
+
+	}
+
 	/**
 	 * Insert data into database
 	 * 
@@ -568,6 +685,14 @@ public class UniversityBookshop {
 		if (student_id == -1) {
 			System.out.println("No valid student ID was entered. Exiting the order placement process.");
 			return;
+		}
+
+		// check if have outstanding order
+		if (outstandingOrderSearchbyStudentID(student_id)) {
+			System.out.println("You have outstanding order. Please wait.");
+			return;
+		} else {
+			System.out.println("You don't have outstanding order. You can place order now.");
 		}
 
 		// int student_id = Integer.parseInt(line);
