@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 
@@ -563,6 +564,36 @@ public class UniversityBookshop {
 	}
 
 	/*
+	 * Ask to enter a student ID.
+	 */
+	public int askForOrderId() {
+		while (true) {
+			// prompt the user for a student ID
+			System.out.println("Please enter a Order ID:");
+			String line = in.nextLine();
+			int order_id = Integer.parseInt(line);
+
+			// check if the student ID exists in the database
+			if (checkOrder(order_id)) {
+				System.out.println("Student ID " + order_id + " exists in the database.");
+				return order_id; // exit the method and return the valid student ID
+			} else {
+				System.out.println("Student ID " + order_id + " does not exist in the database.");
+
+				// prompt the user to enter a new student ID or exit the program
+				System.out.println("Would you like to enter a new student ID? (Y/N)");
+				line = in.nextLine();
+
+				if (line.equalsIgnoreCase("N")) {
+					// exit the method without returning a valid student ID
+					return -1; // or any other invalid value to indicate no valid student ID was entered
+				}
+			}
+		}
+
+	}
+
+	/*
 	 * Check if the student ID exists in the database.
 	 */
 	public boolean checkStudentId(int student_id) {
@@ -605,6 +636,32 @@ public class UniversityBookshop {
 
 			if (exists) {
 				System.out.println("There are still pending orders.");
+			}
+
+			stm.close();
+			result.close();
+
+			return !exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean allNOTDelivered(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Orders_Book WHERE delivery_date <= SYSDATE AND order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			if (exists) {
+				System.out.println("There are delivered orders...");
 			}
 
 			stm.close();
@@ -819,43 +876,48 @@ public class UniversityBookshop {
 
 			// Check the answer
 			if (answer.equalsIgnoreCase("Y")) {
-				// Proceed with payment
-				String[] payment_result = getPaymentInfo();
-				String payment_method = payment_result[0];
-				String card_no = payment_result[1];
+				boolean paymentSuccess = false;
+				while (!paymentSuccess) {
+					String[] payment_result = getPaymentInfo();
+					String payment_method = payment_result[0];
+					String card_no = payment_result[1];
 
-				try {
-					// Insert the order details into the Orders table
-					if (insertOrder(order_id, student_id, total_price, payment_method, card_no).equals("error")) {
-						System.out.println("Invalid card number. Start Over...");
-						return;
-					} else {
-						System.out.println("Payment successful!");
-
-						System.out.println("I will add info for every book now...");
-
-						// Loop through the book orders and insert the details into the Order_Details
-						// table
-						for (BookOrder order : orders) {
-							try {
-								InsertBook(order_id, order.getBookId(), order.getBookAmount());
-							} catch (SQLException e) {
-								System.out.println("Error inserting book order details: " + e.getMessage());
+					try {
+						String insertResult = insertOrder(order_id, student_id, total_price, payment_method, card_no);
+						if (insertResult.equals("error")) {
+							System.out.println("Invalid card number. Do you want to try again? (Y/N)");
+							Scanner scanner = new Scanner(System.in);
+							String response = scanner.nextLine();
+							if (!response.equalsIgnoreCase("Y")) {
+								return;
+							}
+						} else {
+							System.out.println("Payment successful!");
+							paymentSuccess = true;
+							for (BookOrder order : orders) {
+								try {
+									InsertBook(order_id, order.getBookId(), order.getBookAmount());
+								} catch (SQLException e) {
+									System.out.println("Error inserting book order details: " + e.getMessage());
+								}
 							}
 						}
-					}
 
-				} catch (SQLException e) {
-					System.out.println("Error inserting order details: " + e.getMessage());
+					} catch (SQLException e) {
+						System.out.println("Error inserting order details: " + e.getMessage());
+					}
 				}
 
 			} else {
-				// Cancel payment , cancel order
+
+				System.out.println("Payment cancelled. Order not placed.");
 			}
 
 			updateDiscount(student_id);
+		} else {
+			System.out.println("No books were added to the order. Exiting the order placement process.");
 		}
-		return;
+		// return;
 
 	}
 
@@ -913,6 +975,74 @@ public class UniversityBookshop {
 		}
 	}
 
+	public String cancelOrder(int order_id) {
+
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			stm.executeUpdate(sql); // please pay attention that we use
+									// executeUpdate to update the database
+
+			stm.close();
+
+			System.out.println("succeed to delete Order " + order_id);
+			return "success";
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("fail to delete order " + order_id);
+			// noException = false;
+			return "error";
+		}
+	}
+
+	public void cancelOrder() {
+
+		/**
+		 * A sample input is:
+		 */
+		int order_id = askForStudentId();
+
+		if (order_id == -1) {
+			System.out.println("No valid order ID was entered. Exiting the order cancel process.");
+			return;
+		}
+
+		System.out.println("Information about your order...");
+
+		orderSearchbyID(order_id);
+
+		if (allNOTDelivered(order_id)) {
+			System.out.println("Some or All books in this order have been delivered. You cannot cancel this order.");
+			return;
+		}
+
+		if (getOrderAgeInDays(order_id) > 7) {
+			System.out.println("This order is older than 7 days. You cannot cancel this order.");
+			return;
+		}
+
+		System.out.println("Do you want to cancel this order? (Y/N)");
+
+		String answer = in.nextLine();
+
+		if (answer.equalsIgnoreCase("Y")) {
+			if (cancelOrder(order_id).equals("error")) {
+				System.out.println("Error cancelling order. Start Over...");
+				return;
+			} else {
+				System.out.println("Order cancelled successfully!");
+			}
+		} else {
+			System.out.println("You have chosen not to cancel the order.");
+		}
+
+	}
+
 	/*
 	 * Check if the order ID exists in the database.
 	 */
@@ -939,6 +1069,40 @@ public class UniversityBookshop {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	public int getOrderAgeInDays(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT order_date FROM Orders WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			if (!exists) {
+				System.out.println("This order does not exist.");
+				return -1; // return -1 to indicate that the order does not exist
+			}
+
+			// get the order date from the result set
+			Date orderDate = result.getDate("order_date");
+
+			// calculate the age of the order in days
+			long ageInMillis = System.currentTimeMillis() - orderDate.getTime();
+			int ageInDays = (int) TimeUnit.MILLISECONDS.toDays(ageInMillis);
+
+			stm.close();
+			result.close();
+
+			return ageInDays;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return -1; // return -1 to indicate an error occurred
 		}
 	}
 
