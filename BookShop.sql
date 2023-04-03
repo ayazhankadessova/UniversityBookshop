@@ -71,10 +71,10 @@ INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel GarcÃ­a MÃ
 
 -- Insert into Student table
 PROMPT INSERT Student TABLE;
-INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 0.05);
-INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 0.10);
-INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 0.15);
-INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.02);
+INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 0.00);
+INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 0.00);
+INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 0.00);
+INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.00);
 
 -- Insert into Orders table
 -- PROMPT INSERT Orders TABLE;
@@ -93,10 +93,24 @@ INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.02);
 -- INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
 -- INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
 
+COMMIT;
 
---up to here
 
--- done
+-- to check again
+-- Check if there is credit card when payment opton is credit card
+CREATE OR REPLACE TRIGGER check_credit_card
+BEFORE INSERT ON Orders
+FOR EACH ROW
+BEGIN
+  -- Check if payment method is credit card and card number is valid
+  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL ) THEN
+    -- Raise an error if the card number is not valid
+    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
+  END IF;
+END;
+/
+
+
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
 BEFORE INSERT ON Orders_Book
@@ -114,31 +128,31 @@ END;
 /
 
 -- done
--- Create a trigger to update the total price of the order in the Orders table after we Insert a new row into the Orders_Book table
+-- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER update_total_price_and_amount 
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
-  v_order_count NUMBER;
+  -- v_order_count NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
 
-  -- Check if the order exists
-  SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
+  -- -- Check if the order exists
+  -- SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
 
-  -- -- Insert into Orders table if it doesn't exist
-  -- IF v_order_count = 0 THEN
-  --   INSERT INTO Orders
-  --   VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
-  -- END IF;
+  -- -- -- Insert into Orders table if it doesn't exist
+  -- -- IF v_order_count = 0 THEN
+  -- --   INSERT INTO Orders
+  -- --   VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
+  -- -- END IF;
 
-  -- -- -- -- Update total price in Orders table
-  -- UPDATE Orders
-  -- SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
-  --                    FROM Book
-  --                    WHERE Book.book_id = :NEW.book_id)
-  -- WHERE order_id = :NEW.order_id;
+  -- -- -- -- -- Update total price in Orders table
+  -- -- UPDATE Orders
+  -- -- SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
+  -- --                    FROM Book
+  -- --                    WHERE Book.book_id = :NEW.book_id)
+  -- -- WHERE order_id = :NEW.order_id;
 
   -- Update book amount
   UPDATE Book
@@ -148,7 +162,9 @@ END;
 /
 
 
--- Create a trigger to check if we can cancel order
+-- Create a trigger to check if we can cancel order:
+-- 1. Order has to be made in recent 7 days
+-- 2. No books have already been delivered
 CREATE OR REPLACE TRIGGER check_order_cancel
 BEFORE DELETE ON Orders
 FOR EACH ROW
@@ -175,108 +191,6 @@ BEGIN
 END;
 /
 
--- to check again
--- Create a trigger to update the total price of the order in the Orders table after we Delete a row from the Orders_Book table
--- and update the amount of the book in the Book table
--- and update the discount of the student in the Student table
---hey
-CREATE OR REPLACE TRIGGER check_credit_card
-BEFORE INSERT ON Orders
-FOR EACH ROW
-BEGIN
-  -- Check if payment method is credit card and card number is valid
-  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL ) THEN
-    -- Raise an error if the card number is not valid
-    RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
-  END IF;
-END;
-/
-
-
-
--- Create a trigger to update the discount of the student in the Student table after we Insert a new row into the Orders table or Delete
--- CREATE OR REPLACE TRIGGER update_total_spent
--- AFTER INSERT ON Orders
--- FOR EACH ROW
--- DECLARE
---     year INT;
---     total DECIMAL(10,2);
---     discount DECIMAL(10,2);
--- BEGIN
---     year := EXTRACT(YEAR FROM :NEW.order_date);
---     SELECT SUM(total_price) INTO total
---     FROM Orders
---     WHERE student_id = :NEW.student_id AND EXTRACT(YEAR FROM order_date) = year;
-
---     CASE
---         WHEN total > 2000 THEN discount := 0.20;
---         WHEN total > 1000 THEN discount := 0.10;
---         ELSE discount := 0;
---     END CASE;
-
---     UPDATE Student
---     SET Student.discount = discount
---     WHERE student_id = :NEW.student_id;
--- END;
--- /
-
--- CREATE OR REPLACE TRIGGER update_total_spent
--- AFTER INSERT OR DELETE ON Orders
--- FOR EACH ROW
--- BEGIN
---   update_student_discount(:OLD.student_id);
---   update_student_discount(:NEW.student_id);
--- END;
--- /
-
--- CREATE OR REPLACE PROCEDURE update_student_discount(student_id IN NUMBER) AS
---   year INT;
---   total DECIMAL(10,2);
---   discount DECIMAL(10,2);
--- BEGIN
---   year := EXTRACT(YEAR FROM SYSDATE);
---   SELECT SUM(total_price) INTO total
---   FROM Orders
---   WHERE student_id = student_id AND EXTRACT(YEAR FROM order_date) = year AND order_id != :NEW.order_id;
-
---   IF total IS NOT NULL THEN
---     IF total > 2000 THEN
---       discount := 0.20;
---     ELSIF total > 1000 THEN
---       discount := 0.10;
---     ELSE
---       discount := 0;
---     END IF;
-
---     UPDATE Student
---     SET discount = discount
---     WHERE student_id = student_id;
---   END IF;
--- END;
--- /
-
-UPDATE Student
-SET discount = (
-  CASE
-    WHEN (
-      SELECT COALESCE(SUM(total_price), 0)
-      FROM Orders
-      WHERE student_id = 1
-      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-    ) > 2000 THEN 0.20
-    WHEN (
-      SELECT COALESCE(SUM(total_price), 0)
-      FROM Orders
-      WHERE student_id = 1
-      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-    ) > 1000 THEN 0.10
-    ELSE 0
-  END
-)
-WHERE student_id = 1;
-
-
-
--- COMMIT;
+COMMIT;
 
 -- SET AUTOCOMMIT ON
