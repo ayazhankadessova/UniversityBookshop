@@ -268,7 +268,8 @@ public class UniversityBookshop {
 		try {
 			Statement stm = conn.createStatement();
 			String sql = "SELECT order_id FROM Orders WHERE student_id = " + student_id
-					+ " AND order_delivered = false";
+					+ " AND order_delivered = 'pending'";
+
 			ResultSet rs = stm.executeQuery(sql);
 
 			boolean exists = rs.next();
@@ -363,10 +364,8 @@ public class UniversityBookshop {
 							result = String.format("%.2f", rs.getBigDecimal(heads[i]));
 							break;
 						case "payment_method":
-							result = rs.getString(heads[i]);
-							break;
 						case "delivered":
-							result = rs.getBoolean(heads[i]) ? "Yes" : "No";
+							result = rs.getString(heads[i]);
 							break;
 						case "card_no":
 							if (rs.getString(heads[i]) == null) {
@@ -629,7 +628,7 @@ public class UniversityBookshop {
 				return;
 			}
 
-			String sql = "UPDATE Orders SET order_delivered = true WHERE order_id = " + order_id;
+			String sql = "UPDATE Orders SET order_delivered = 'delivered' WHERE order_id = " + order_id;
 
 			System.out.println(sql);
 

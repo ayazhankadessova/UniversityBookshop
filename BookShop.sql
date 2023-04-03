@@ -32,7 +32,7 @@ CREATE TABLE Orders (
     total_price DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(20) NOT NULL,
     card_no VARCHAR(16),
-    order_delivered BOOLEAN NOT NULL DEFAULT FALSE,
+    order_delivered VARCHAR(20) DEFAULT 'pending',
     PRIMARY KEY (order_id),
     FOREIGN KEY (student_id) REFERENCES Student(student_id)
 );
