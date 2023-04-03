@@ -203,9 +203,8 @@ public class UniversityBookshop {
 				orderSearchforStudent();
 			} else if (choice == 3) {
 				placeOrder();
-
 			} else if (choice == 4) {
-				// cancelorder();
+				cancelOrder();
 			} else if (choice == 5) {
 				displayBooks();
 			} else if (choice == 6) {
@@ -575,13 +574,13 @@ public class UniversityBookshop {
 
 			// check if the student ID exists in the database
 			if (checkOrder(order_id)) {
-				System.out.println("Student ID " + order_id + " exists in the database.");
+				System.out.println("Order ID " + order_id + " exists in the database.");
 				return order_id; // exit the method and return the valid student ID
 			} else {
-				System.out.println("Student ID " + order_id + " does not exist in the database.");
+				System.out.println("Order ID " + order_id + " does not exist in the database.");
 
 				// prompt the user to enter a new student ID or exit the program
-				System.out.println("Would you like to enter a new student ID? (Y/N)");
+				System.out.println("Would you like to enter a new Order ID? (Y/N)");
 				line = in.nextLine();
 
 				if (line.equalsIgnoreCase("N")) {
@@ -1005,7 +1004,7 @@ public class UniversityBookshop {
 		/**
 		 * A sample input is:
 		 */
-		int order_id = askForStudentId();
+		int order_id = askForOrderId();
 
 		if (order_id == -1) {
 			System.out.println("No valid order ID was entered. Exiting the order cancel process.");
