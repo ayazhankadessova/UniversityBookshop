@@ -53,6 +53,7 @@ public class UniversityBookshop {
 	String[] options = {
 			"🔍 Search Order by OrderID",
 			"🔍👩‍💻 Search Order by StudentID", // changed to student emoji
+			"🔍📚 Update Order for Student",
 			"🛍️ Place an Order",
 			"🗑️ Cancel an Order",
 			"📚 Show All Books",
@@ -200,14 +201,16 @@ public class UniversityBookshop {
 			if (choice == 1) {
 				orderSearchbyID();
 			} else if (choice == 2) {
-				orderSearchforStudent();
+				orderSearchforStudent("Search");
 			} else if (choice == 3) {
-				placeOrder();
+				orderSearchforStudent("Update");
 			} else if (choice == 4) {
-				cancelOrder();
+				placeOrder();
 			} else if (choice == 5) {
-				displayBooks();
+				cancelOrder();
 			} else if (choice == 6) {
+				displayBooks();
+			} else if (choice == 7) {
 				listAllOrders();
 			} else if (options[choice - 1].equalsIgnoreCase("exit")) {
 				break;
@@ -224,103 +227,6 @@ public class UniversityBookshop {
 			return;
 
 		orderSearchbyID(order_id);
-	}
-
-	private void orderSearchforStudent() {
-		int student_id = askForStudentId();
-
-		if (student_id == -1) {
-			System.out.println("No valid student ID was entered. Exiting the order search process.");
-			return;
-		}
-		orderSearchbyStudentID(student_id);
-
-	}
-
-	private void orderSearchbyStudentID(int student_id) {
-		try {
-			Statement stm = conn.createStatement();
-			String sql = "SELECT order_id FROM Orders WHERE Student_id =" + student_id;
-			ResultSet rs = stm.executeQuery(sql);
-
-			boolean exists = rs.next();
-			if (!exists) {
-				System.out.println("No such order");
-				return;
-			}
-
-			while (exists) { // this is the result record iterator, see the
-
-				orderSearchbyID(rs.getInt(1));
-				System.out.println("============================================");
-				exists = rs.next();
-
-			}
-			rs.close();
-			stm.close();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			// noException = false;
-		}
-	}
-
-	public boolean outstandingOrderSearchbyStudentID(int student_id) {
-		try {
-			Statement stm = conn.createStatement();
-			String sql = "SELECT order_id FROM Orders WHERE student_id = " + student_id
-					+ " AND order_delivered = 'pending'";
-
-			ResultSet rs = stm.executeQuery(sql);
-
-			boolean exists = rs.next();
-			if (!exists) {
-				System.out.println("No such order");
-				return false;
-			}
-
-			while (exists) { // this is the result record iterator, see the
-
-				orderSearchbyID(rs.getInt(1));
-				System.out.println("============================================");
-				exists = rs.next();
-
-			}
-			rs.close();
-			stm.close();
-
-			return true;
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			// noException = false;
-			return false;
-
-		}
-	}
-
-	/**
-	 * List all Orders in the database.
-	 */
-	private void listAllOrders() {
-		System.out.println("All orders in the database now:");
-		try {
-			Statement stm = conn.createStatement();
-			String sql = "SELECT order_id FROM Orders";
-			System.out.println(sql);
-
-			ResultSet rs = stm.executeQuery(sql);
-
-			while (rs.next()) { // this is the result record iterator, see the
-
-				orderSearchbyID(rs.getInt(1));
-				System.out.println("============================================");
-
-			}
-			rs.close();
-			stm.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			// noException = false;
-		}
 	}
 
 	/**
@@ -390,8 +296,125 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Given student_id, find all orders for the student driver.
+	 */
+	private void orderSearchforStudent(String choice) {
+		int student_id = askForStudentId();
+
+		if (student_id == -1) {
+			System.out.println("No valid student ID was entered. Exiting the order search process.");
+			return;
+		}
+		orderSearchbyStudentID(student_id, choice);
+		System.out.println("Lets us " + choice + " the order(s) now.");
+
+	}
+
+	/*
+	 * Given student_id, find all orders for the student.
+	 */
+	private void orderSearchbyStudentID(int student_id, String choice) {
+		try {
+			Statement stm = conn.createStatement();
+			String sql = "SELECT order_id FROM Orders WHERE Student_id =" + student_id;
+			ResultSet rs = stm.executeQuery(sql);
+
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
+				return;
+			}
+
+			while (exists) { // this is the result record iterator, see the
+
+				switch (choice) {
+					case "Search":
+						orderSearchbyID(rs.getInt(1));
+						break;
+					case "Update":
+						updateOrder(rs.getInt(1));
+						break;
+					default:
+						break;
+				}
+				// orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+				exists = rs.next();
+
+			}
+			rs.close();
+			stm.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			// noException = false;
+		}
+	}
+
+	/*
+	 * Given student_id, find all orders for the student that are not delivered.
+	 */
+	public boolean outstandingOrderSearchbyStudentID(int student_id) {
+		try {
+			Statement stm = conn.createStatement();
+			String sql = "SELECT order_id FROM Orders WHERE student_id = " + student_id
+					+ " AND order_delivered = 'pending'";
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
+				return false;
+			}
+
+			while (exists) { // this is the result record iterator, see the
+
+				orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+				exists = rs.next();
+
+			}
+			rs.close();
+			stm.close();
+
+			return true;
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			// noException = false;
+			return false;
+
+		}
+	}
+
 	/**
-	 * Show all Books.
+	 * List all Orders in the database.
+	 */
+	private void listAllOrders() {
+		System.out.println("All orders in the database now:");
+		try {
+			Statement stm = conn.createStatement();
+			String sql = "SELECT order_id FROM Orders";
+			System.out.println(sql);
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			while (rs.next()) { // this is the result record iterator, see the
+
+				orderSearchbyID(rs.getInt(1));
+				System.out.println("============================================");
+
+			}
+			rs.close();
+			stm.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// noException = false;
+		}
+	}
+
+	/**
+	 * Show all Books in the database.
 	 */
 	private void displayBooks() {
 
@@ -516,7 +539,7 @@ public class UniversityBookshop {
 					")\n" +
 					"WHERE student_id = " + student_id;
 
-			System.out.println(sql);
+			// System.out.println(sql);
 
 			stm.executeUpdate(sql);
 
