@@ -347,7 +347,7 @@ public class UniversityBookshop {
 			}
 
 			String[] heads = { "order_id", "student_id", "order_date", "total_price", "💳 payment_method",
-					"card_no", "delivered" };
+					"card_no", "order_delivered" };
 
 			while (exists) {
 				for (int i = 0; i < 7; i++) {
@@ -364,7 +364,7 @@ public class UniversityBookshop {
 							result = String.format("%.2f", rs.getBigDecimal(heads[i]));
 							break;
 						case "payment_method":
-						case "delivered":
+						case "order_delivered":
 							result = rs.getString(heads[i]);
 							break;
 						case "card_no":
