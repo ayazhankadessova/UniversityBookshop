@@ -260,7 +260,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -291,7 +291,7 @@ public class UniversityBookshop {
 			return true;
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 			return false;
 
 		}
@@ -319,7 +319,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -386,7 +386,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -417,7 +417,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -448,7 +448,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			noException = false;
+			// noException = false;
 
 		}
 	}
@@ -480,7 +480,7 @@ public class UniversityBookshop {
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 
 		return result;
@@ -527,7 +527,7 @@ public class UniversityBookshop {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Could not update discount for student " + student_id);
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -641,7 +641,7 @@ public class UniversityBookshop {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Could not update order " + order_id);
-			noException = false;
+			// noException = false;
 		}
 	}
 
@@ -665,7 +665,7 @@ public class UniversityBookshop {
 			stm.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 
 	}
@@ -826,20 +826,25 @@ public class UniversityBookshop {
 
 				try {
 					// Insert the order details into the Orders table
-					insertOrder(order_id, student_id, total_price, payment_method);
-					System.out.println("Success! I will add info for every book now...");
+					if (insertOrder(order_id, student_id, total_price, payment_method, card_no).equals("error")) {
+						System.out.println("Invalid card number. Start Over...");
+						return;
+					} else {
+						System.out.println("Payment successful!");
 
-					// Loop through the book orders and insert the details into the Order_Details
-					// table
-					for (BookOrder order : orders) {
-						try {
-							InsertBook(order_id, order.getBookId(), order.getBookAmount());
-						} catch (SQLException e) {
-							System.out.println("Error inserting book order details: " + e.getMessage());
+						System.out.println("I will add info for every book now...");
+
+						// Loop through the book orders and insert the details into the Order_Details
+						// table
+						for (BookOrder order : orders) {
+							try {
+								InsertBook(order_id, order.getBookId(), order.getBookAmount());
+							} catch (SQLException e) {
+								System.out.println("Error inserting book order details: " + e.getMessage());
+							}
 						}
 					}
 
-					System.out.println("Success! All order information has been added.");
 				} catch (SQLException e) {
 					System.out.println("Error inserting order details: " + e.getMessage());
 				}
@@ -869,25 +874,27 @@ public class UniversityBookshop {
 
 			stm.close();
 
-			System.out.println("succeed to insert Order " + order_id);
+			System.out.println("succeed to insert Book" + bookId);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("fail to Insert Book " + bookId);
-			noException = false;
+			// noException = false;
 			// return "error";
 		}
 	}
 
-	public void insertOrder(int order_id, int student_id, double total_price, String payment_method)
+	public String insertOrder(int order_id, int student_id, double total_price, String payment_method, String card_no)
 			throws SQLException {
 
 		try {
 			Statement stm = conn.createStatement();
 
-			String sql = "INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method) " +
+			String sql = "INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no) "
+					+
 					"VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ", '" + payment_method
-					+ "')";
+					+ "', '" + card_no + "')";
+
 			System.out.println(sql);
 
 			stm.executeUpdate(sql); // please pay attention that we use
@@ -896,12 +903,13 @@ public class UniversityBookshop {
 			stm.close();
 
 			System.out.println("succeed to insert Order " + order_id);
+			return "success";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("fail to insert order " + order_id);
-			noException = false;
-			// return "error";
+			// noException = false;
+			return "error";
 		}
 	}
 
@@ -1010,7 +1018,7 @@ public class UniversityBookshop {
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 
 		return result;
@@ -1042,7 +1050,7 @@ public class UniversityBookshop {
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 
 		return result;
@@ -1074,7 +1082,7 @@ public class UniversityBookshop {
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			noException = false;
+			// noException = false;
 		}
 
 		return result;
@@ -1127,7 +1135,6 @@ public class UniversityBookshop {
 
 		if (paymentMethod.equalsIgnoreCase("Credit Card")) {
 			// If payment method is credit card, prompt for card number
-			System.out.print("Enter card number: ");
 			cardNumber = getCreditCard();
 			// Process credit card payment with the card number
 			System.out.println("Processing credit card payment with card number: " + cardNumber);
