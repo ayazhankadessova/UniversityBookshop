@@ -185,7 +185,7 @@ BEFORE INSERT ON Orders
 FOR EACH ROW
 BEGIN
   -- Check if payment method is credit card and card number is valid
-  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL OR length(:NEW.card_no) != 16 ) THEN
+  IF :NEW.payment_method = 'Credit Card' AND ( :NEW.card_no IS NULL ) THEN
     -- Raise an error if the card number is not valid
     RAISE_APPLICATION_ERROR(-20001, 'Invalid credit card number');
   END IF;
