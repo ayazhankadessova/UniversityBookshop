@@ -58,3 +58,4 @@ With these options, the University BookShop manager can effectively manage the b
 2) remove sql prints
 3) doesnt show payment method
 4) decide on delivery date
+5) after placing order, options printec twice
