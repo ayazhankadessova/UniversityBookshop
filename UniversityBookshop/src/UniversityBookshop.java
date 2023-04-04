@@ -257,7 +257,7 @@ public class UniversityBookshop {
 	private void orderSearchbyID() {
 		System.out.println("Please input order_id or -1 for exit:");
 
-		int order_id = in.nextInt();
+		int order_id = Integer.parseInt(in.nextLine());
 
 		if (order_id == -1)
 			return;
@@ -647,6 +647,7 @@ public class UniversityBookshop {
 		while (true) {
 			// prompt the user for a student ID
 			System.out.println("Please enter a student ID:");
+
 			String line = in.nextLine();
 			int student_id = Integer.parseInt(line);
 
@@ -677,6 +678,7 @@ public class UniversityBookshop {
 		while (true) {
 			// prompt the user for a student ID
 			System.out.println("Please enter a Order ID:");
+
 			String line = in.nextLine();
 			int order_id = Integer.parseInt(line);
 
@@ -875,8 +877,8 @@ public class UniversityBookshop {
 
 		// Prompt the user to enter the number of different books to order
 		System.out.print("How many different books would you like to order? ");
-		int numBooks = in.nextInt();
-		in.nextLine(); // consume the remaining newline character
+
+		int numBooks = Integer.parseInt(in.nextLine());
 
 		double total_price = 0;
 
@@ -911,7 +913,8 @@ public class UniversityBookshop {
 					}
 
 					System.out.print("New book amount: ");
-					int newAmount = in.nextInt();
+
+					int newAmount = Integer.parseInt(in.nextLine());
 					in.nextLine(); // consume the remaining newline character
 
 					// Check if there is enough stock of the book
@@ -947,8 +950,7 @@ public class UniversityBookshop {
 
 				// Prompt the user to enter the book amount
 				System.out.print("➖Enter Book amount: " + "\n➖Available: " + stock + ": )");
-				int bookAmount = in.nextInt();
-				in.nextLine(); // consume the remaining newline character
+				int bookAmount = Integer.parseInt(in.nextLine());
 
 				if (bookAmount > stock) {
 					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock
@@ -999,8 +1001,7 @@ public class UniversityBookshop {
 						String insertResult = insertOrder(order_id, student_id, total_price, payment_method, card_no);
 						if (insertResult.equals("error")) {
 							System.out.println("Invalid card number. Do you want to try again? (Y/N)");
-							Scanner scanner = new Scanner(System.in);
-							String response = scanner.nextLine();
+							String response = in.nextLine();
 							if (!response.equalsIgnoreCase("Y")) {
 								return;
 							}
@@ -1258,8 +1259,7 @@ public class UniversityBookshop {
 
 		while (!valid_id) {
 			System.out.print("Enter book ID (or -1 to exit): ");
-			book_id = in.nextInt();
-			in.nextLine(); // consume the remaining newline character
+			book_id = Integer.parseInt(in.nextLine());
 
 			if (book_id == -1) {
 				return -1; // Return -1 to indicate program exit
@@ -1386,7 +1386,8 @@ public class UniversityBookshop {
 		}
 
 		// Read user input for payment method
-		int paymentOption = in.nextInt();
+		int paymentOption = Integer.parseInt(in.nextLine());
+
 		String paymentMethod;
 
 		// Assign payment method based on user input
@@ -1418,8 +1419,12 @@ public class UniversityBookshop {
 		if (paymentMethod.equalsIgnoreCase("Credit Card")) {
 			// If payment method is credit card, prompt for card number
 			cardNumber = getCreditCard();
-			// Process credit card payment with the card number
-			System.out.println("Processing credit card payment with card number: " + cardNumber);
+			if (cardNumber == null) {
+				System.out.println("This will result in error... " + cardNumber);
+			} else {
+				// Process credit card payment with the card number
+				System.out.println("Processing credit card payment with card number: " + cardNumber);
+			}
 		} else {
 			// Process non-credit card payment
 			System.out.println("Processing " + paymentMethod + " payment.");
@@ -1432,10 +1437,19 @@ public class UniversityBookshop {
 	}
 
 	private String getCreditCard() {
-		System.out.print("Enter card number: ");
-		String cardNumber = in.next();
-		System.out.println("Processing credit card payment with card number: " + cardNumber);
-		return cardNumber;
+		while (true) {
+			System.out.print("Please enter your credit card number (16 digits), or enter \"-1\" to exit: ");
+			String input = in.nextLine();
+			if (input.equals("-1")) {
+				return null;
+			}
+			String creditCardNumber = input.replaceAll("\\s+", "");
+			if (creditCardNumber.matches("\\d{16}")) {
+				return creditCardNumber;
+			} else {
+				System.out.println("Invalid credit card number. Please try again.");
+			}
+		}
 	}
 
 	/**
