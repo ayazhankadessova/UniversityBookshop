@@ -285,9 +285,57 @@ public class UniversityBookshop {
 				}
 				exists = rs.next();
 			}
-
+			System.out.println("\n===============Books List: ===================\n");
+			displayBooksInOrder(order_id);
 			rs.close();
 			stm.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// noException = false;
+		}
+
+	}
+
+	/**
+	 * Show all Books in the Order.
+	 */
+	private void displayBooksInOrder(int order_id) {
+
+		try {
+			Statement stm = conn.createStatement();
+
+			String sql = "SELECT * FROM Orders_Book WHERE order_id = " + order_id;
+
+			System.out.println(sql);
+
+			ResultSet rs = stm.executeQuery(sql);
+
+			boolean exists = rs.next();
+			if (!exists) {
+				System.out.println("No such order");
+				return;
+			}
+
+			String[] heads = { "order_id", "book_id", "book_amount", "delivery_date" };
+
+			while (exists) {
+				for (int i = 0; i < 7; i++) {
+					String result = "";
+					switch (heads[i]) {
+						case "delivery_date":
+							result = rs.getDate(heads[i]).toString();
+							break;
+						default:
+							result = Integer.toString(rs.getInt(heads[i]));
+							break;
+					}
+					System.out.println("➖" + heads[i] + " : " + result);
+				}
+				exists = rs.next();
+			}
+			rs.close();
+			stm.close();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// noException = false;
@@ -953,8 +1001,9 @@ public class UniversityBookshop {
 		try {
 			Statement stm = conn.createStatement();
 
+			int randomInterval = 3 + (int) (Math.random() * (14 - 3 + 1)); // Generate a random integer between 3 and 14
 			String sql = "INSERT INTO Orders_Book VALUES (" + order_id + "," + bookId + "," + bookAmount + ","
-					+ "SYSDATE + INTERVAL '14' DAY)";
+					+ "SYSDATE + INTERVAL '" + randomInterval + "' DAY)";
 
 			System.out.println(sql);
 
