@@ -319,6 +319,7 @@ public class UniversityBookshop {
 			String[] heads = { "order_id", "book_id", "book_amount", "delivery_date" };
 
 			while (exists) {
+				System.out.println("===============Book Info: ===================");
 				for (int i = 0; i < 4; i++) {
 					String result = "";
 					switch (heads[i]) {
@@ -331,6 +332,7 @@ public class UniversityBookshop {
 					}
 					System.out.println("➖" + heads[i] + " : " + result);
 				}
+
 				exists = rs.next();
 			}
 			rs.close();
