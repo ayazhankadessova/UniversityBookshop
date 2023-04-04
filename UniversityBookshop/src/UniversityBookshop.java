@@ -280,8 +280,6 @@ public class UniversityBookshop {
 								result = rs.getString(heads[i]);
 							}
 							break;
-						default:
-							break;
 					}
 					System.out.println("➖" + heads[i] + " : " + result);
 				}
@@ -307,7 +305,6 @@ public class UniversityBookshop {
 			return;
 		}
 		orderSearchbyStudentID(student_id, choice);
-		System.out.println("Lets us " + choice + " the order(s) now.");
 
 	}
 
@@ -325,6 +322,8 @@ public class UniversityBookshop {
 				System.out.println("No such order");
 				return;
 			}
+
+			System.out.println("Lets us " + choice + " the order(s) now.");
 
 			while (exists) { // this is the result record iterator, see the
 
@@ -703,7 +702,7 @@ public class UniversityBookshop {
 			if (allDelivered(order_id)) {
 				System.out.println("All books in order " + order_id + " have been delivered.");
 			} else {
-				System.out.println("There are still pending orders.");
+				// System.out.println("There are still pending orders.");
 				return;
 			}
 
@@ -1038,9 +1037,11 @@ public class UniversityBookshop {
 
 		orderSearchbyID(order_id);
 
-		if (allNOTDelivered(order_id)) {
+		if (!allNOTDelivered(order_id)) {
 			System.out.println("Some or All books in this order have been delivered. You cannot cancel this order.");
 			return;
+		} else {
+			System.out.println("All books in this order have not been delivered.");
 		}
 
 		if (getOrderAgeInDays(order_id) > 7) {
