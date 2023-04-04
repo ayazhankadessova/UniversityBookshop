@@ -166,31 +166,31 @@ END;
 -- 1. Order has to be made in recent 7 days
 -- 2. No books have already been delivered
 -- all checked in jdbc :)
-CREATE OR REPLACE TRIGGER check_order_cancel
-BEFORE DELETE ON Orders
-FOR EACH ROW
-DECLARE
-    order_age NUMBER;
-    book_delivered NUMBER;
-    v_order_date DATE;
-BEGIN
+-- CREATE OR REPLACE TRIGGER check_order_cancel
+-- BEFORE DELETE ON Orders
+-- FOR EACH ROW
+-- DECLARE
+--     order_age NUMBER;
+--     book_delivered NUMBER;
+--     v_order_date DATE;
+-- BEGIN
 
-    -- order_age := :OLD.order_date - SYSDATE;
+--     -- order_age := :OLD.order_date - SYSDATE;
 
-    -- IF order_age > 7 THEN
-    --     RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
-    -- END IF;
+--     -- IF order_age > 7 THEN
+--     --     RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
+--     -- END IF;
     
-    -- Check if any book has been delivered
-    SELECT COUNT(*) INTO book_delivered
-    FROM Orders_Book
-    WHERE order_id = :OLD.order_id AND delivery_date > SYSDATE;
+--     -- Check if any book has been delivered
+--     -- SELECT COUNT(*) INTO book_delivered
+--     -- FROM Orders_Book
+--     -- WHERE order_id = :OLD.order_id AND delivery_date > SYSDATE;
 
-    IF book_delivered > 0 THEN
-        RAISE_APPLICATION_ERROR(-20002, 'Cannot cancel order: some books have already been delivered');
-    END IF;
-END;
-/
+--     -- IF book_delivered > 0 THEN
+--     --     RAISE_APPLICATION_ERROR(-20002, 'Cannot cancel order: some books have already been delivered');
+--     -- END IF;
+-- END;
+-- /
 
 COMMIT;
 
