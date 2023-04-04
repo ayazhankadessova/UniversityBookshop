@@ -319,7 +319,7 @@ public class UniversityBookshop {
 			String[] heads = { "order_id", "book_id", "book_amount", "delivery_date" };
 
 			while (exists) {
-				for (int i = 0; i < 7; i++) {
+				for (int i = 0; i < 4; i++) {
 					String result = "";
 					switch (heads[i]) {
 						case "delivery_date":
