@@ -165,6 +165,7 @@ END;
 -- Create a trigger to check if we can cancel order:
 -- 1. Order has to be made in recent 7 days
 -- 2. No books have already been delivered
+-- all checked in jdbc :)
 CREATE OR REPLACE TRIGGER check_order_cancel
 BEFORE DELETE ON Orders
 FOR EACH ROW
@@ -174,11 +175,11 @@ DECLARE
     v_order_date DATE;
 BEGIN
 
-    order_age := :OLD.order_date - SYSDATE;
+    -- order_age := :OLD.order_date - SYSDATE;
 
-    IF order_age > 7 THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
-    END IF;
+    -- IF order_age > 7 THEN
+    --     RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
+    -- END IF;
     
     -- Check if any book has been delivered
     SELECT COUNT(*) INTO book_delivered
