@@ -869,26 +869,29 @@ public class UniversityBookshop {
 							+ " left. We will add them all...");
 
 					bookAmount = stock;
-
-					// Record the successful book order
-					BookOrder order = new BookOrder(bookId, bookAmount);
-					orders.add(order);
-					addedBookIds.add(bookId); // add the book ID to the set of added book IDs
-
-					// Get the price of the book by ID from the database
-					double book_price = getPriceByID(bookId);
-
-					// Calculate the total price for this book
-					double book_total_price = bookAmount * book_price;
-
-					// Add the total price for this book to the overall total price
-					total_price += book_total_price;
-
 				}
+
+				// Record the successful book order
+				BookOrder order = new BookOrder(bookId, bookAmount);
+				orders.add(order);
+				addedBookIds.add(bookId); // add the book ID to the set of added book IDs
+
+				// Get the price of the book by ID from the database
+				double book_price = getPriceByID(bookId);
+
+				// Calculate the total price for this book
+				double book_total_price = bookAmount * book_price;
+
+				// Add the total price for this book to the overall total price
+				total_price += book_total_price;
+
 			}
+
 		}
 
-		if (orders.size() > 0) {
+		if (orders.size() > 0)
+
+		{
 
 			double discount = getDiscount(student_id);
 			total_price = total_price * (1 - discount);
