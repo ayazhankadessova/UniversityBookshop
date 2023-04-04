@@ -1,7 +1,13 @@
 # COMP2016-University BookShop Manager
 
 ## About 
-This is a University BookShop manager that supports that connects and alters Oracle database:
+This is a `Java-based university bookshop database application` that supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
+
+The application uses JDBC driver to access an Oracle database and is implemented with PL/SQL triggers to enforce various business rules.
+
+To use this application, you need to execute the "BookShop.sql" script in your `Oracle database` to create the required tables and triggers, and initialize values for the "Book" and "Student" tables.
+
+*Feel free to download and use this application as a reference for your own database projects.*
 
 ## Setup
 
