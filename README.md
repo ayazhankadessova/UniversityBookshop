@@ -8,6 +8,7 @@ This is a University BookShop manager that supports that connects and alters Ora
 Before running the program, make sure to execute the BookShop.sql file on your Oracle database to create the necessary tables, triggers, and initial values for the Book and Student tables.
 
 - Terminal: 
+
 `@ ./BookShop.sql`
 
 ## Usage
