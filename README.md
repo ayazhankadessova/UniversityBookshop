@@ -1,6 +1,20 @@
 # COMP2016-University BookShop Manager
 
-This is a University BookShop manager that supports the following options:
+## About 
+This is a University BookShop manager that supports that connects and alters Oracle database:
+
+## Setup
+
+Before running the program, make sure to execute the BookShop.sql file on your Oracle database to create the necessary tables, triggers, and initial values for the Book and Student tables.
+
+- Terminal: 
+`@ ./BookShop.sql`
+
+## Usage
+
+To run the program, simply compile and run the Main class. You will be prompted to select an option from the menu to perform the desired operation. Follow the on-screen instructions to complete each operation.
+
+## Options 
 
 1. 🔍 Search Order by OrderID: This option allows the manager to search for a specific order by its unique order ID.
 
