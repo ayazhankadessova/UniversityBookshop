@@ -1,6 +1,4 @@
-# COMP2016-UniversityBookshop
-
-# University BookShop Manager
+# COMP2016-University BookShop Manager
 
 This is a University BookShop manager that supports the following options:
 
