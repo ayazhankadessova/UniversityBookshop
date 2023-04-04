@@ -856,15 +856,17 @@ public class UniversityBookshop {
 				}
 			} else {
 
+				// Check if there is enough stock of the book
+				int stock = getAmount(bookId);
+
 				// Prompt the user to enter the book amount
-				System.out.print("Book amount: ");
+				System.out.print("➖Enter Book amount: " + "\n➖Available: " + stock + ": )");
 				int bookAmount = in.nextInt();
 				in.nextLine(); // consume the remaining newline character
 
-				// Check if there is enough stock of the book
-				int stock = getAmount(bookId);
 				if (bookAmount > stock) {
-					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock);
+					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock
+							+ " left. We will add them all...");
 					continue;
 				} else {
 					// Record the successful book order
@@ -1047,6 +1049,8 @@ public class UniversityBookshop {
 		if (getOrderAgeInDays(order_id) > 7) {
 			System.out.println("This order is older than 7 days. You cannot cancel this order.");
 			return;
+		} else {
+			System.out.println("This order is or less than 7 days old.");
 		}
 
 		System.out.println("Do you want to cancel this order? (Y/N)");
