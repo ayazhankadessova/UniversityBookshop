@@ -867,8 +867,9 @@ public class UniversityBookshop {
 				if (bookAmount > stock) {
 					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock
 							+ " left. We will add them all...");
-					continue;
-				} else {
+
+					bookAmount = stock;
+
 					// Record the successful book order
 					BookOrder order = new BookOrder(bookId, bookAmount);
 					orders.add(order);

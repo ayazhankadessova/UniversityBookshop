@@ -129,14 +129,36 @@ END;
 
 -- done
 -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
-CREATE OR REPLACE TRIGGER update_total_price_and_amount 
+CREATE OR REPLACE TRIGGER update_total_price_and_amount
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
-  -- v_order_count NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
+
+  -- Update book amount
+  UPDATE Book
+  SET amount = amount - v_book_amount
+  WHERE book_id = :NEW.book_id;
+END;
+/
+
+CREATE OR REPLACE TRIGGER add_book_amount
+AFTER DELETE ON Orders_Book
+FOR EACH ROW
+DECLARE
+  v_book_amount NUMBER;
+BEGIN
+  v_book_amount := :OLD.book_amount;
+
+  -- Add book amount back
+  UPDATE Book
+  SET amount = amount + v_book_amount
+  WHERE book_id = :OLD.book_id;
+END;
+/
+
 
   -- -- Check if the order exists
   -- SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
@@ -153,14 +175,6 @@ BEGIN
   -- --                    FROM Book
   -- --                    WHERE Book.book_id = :NEW.book_id)
   -- -- WHERE order_id = :NEW.order_id;
-
-  -- Update book amount
-  UPDATE Book
-  SET amount = amount - v_book_amount
-  WHERE book_id = :NEW.book_id;
-END;
-/
-
 
 -- Create a trigger to check if we can cancel order:
 -- 1. Order has to be made in recent 7 days
@@ -194,4 +208,4 @@ END;
 
 COMMIT;
 
--- SET AUTOCOMMIT ON
+SET AUTOCOMMIT ON
