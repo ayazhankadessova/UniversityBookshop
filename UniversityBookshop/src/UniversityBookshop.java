@@ -254,6 +254,9 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Search order by order_id driver
+	 */
 	private void orderSearchbyID() {
 		System.out.println("Please input order_id or -1 for exit:");
 
@@ -731,6 +734,11 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Check if all the books in the order are delivered
+	 * True - still pending orders
+	 * False - all delivered
+	 */
 	public boolean allDelivered(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -757,6 +765,11 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Check if all the books in the order are NOT delivered (for cancel order)
+	 * True - there are delivered orders
+	 * False - not orders are delivered
+	 */
 	public boolean allNOTDelivered(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -783,6 +796,9 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Update order status to delivered if all delivered to delivered
+	 */
 	public void updateOrder(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
@@ -811,6 +827,9 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * update all orders every time we run the program
+	 */
 	public void update() {
 
 		System.out.println("All orders in the database now:");
@@ -977,6 +996,8 @@ public class UniversityBookshop {
 
 		}
 
+		/* if any books are going to be ordered */
+
 		if (orders.size() > 0)
 
 		{
@@ -1035,6 +1056,7 @@ public class UniversityBookshop {
 
 	}
 
+	/* Insert book to the database */
 	public void InsertBook(int order_id, int bookId, int bookAmount) throws SQLException {
 
 		try {
@@ -1061,6 +1083,9 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Insert Order
+	 */
 	public String insertOrder(int order_id, int student_id, double total_price, String payment_method, String card_no)
 			throws SQLException {
 
@@ -1090,6 +1115,7 @@ public class UniversityBookshop {
 		}
 	}
 
+	/* Cancel Order */
 	public String cancelOrder(int order_id) {
 
 		try {
@@ -1115,6 +1141,9 @@ public class UniversityBookshop {
 		}
 	}
 
+	/*
+	 * Cancel Order driver
+	 */
 	public void cancelOrder() {
 
 		/**
@@ -1436,6 +1465,7 @@ public class UniversityBookshop {
 		return result; // return the chosen payment method
 	}
 
+	/* ask for credit card info */
 	private String getCreditCard() {
 		while (true) {
 			System.out.print("Please enter your credit card number (16 digits), or enter \"-1\" to exit: ");
