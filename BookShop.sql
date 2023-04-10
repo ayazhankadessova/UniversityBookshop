@@ -1,53 +1,53 @@
-PROMPT DROP TABLES;
+-- PROMPT DROP TABLES;
 
-DROP TABLE Book CASCADE CONSTRAINT;
-DROP TABLE Student CASCADE CONSTRAINT;
-DROP TABLE Orders CASCADE CONSTRAINT;
-DROP TABLE Orders_Book CASCADE CONSTRAINT;
+-- DROP TABLE Book CASCADE CONSTRAINT;
+-- DROP TABLE Student CASCADE CONSTRAINT;
+-- DROP TABLE Orders CASCADE CONSTRAINT;
+-- DROP TABLE Orders_Book CASCADE CONSTRAINT;
 
-COMMIT;
-
-
-CREATE TABLE Book (
-    book_id INT,
-    title VARCHAR(30) NOT NULL,
-    author CHAR(30) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    amount INT NOT NULL,
-    PRIMARY KEY (book_id));
-
-CREATE TABLE Student (
-    student_id INT,
-    name VARCHAR(30) NOT NULL,
-    gender VARCHAR(30) NOT NULL,
-    major VARCHAR(30) NOT NULL,
-    discount DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY (student_id)
-);
-
-CREATE TABLE Orders (
-    order_id INT,
-    student_id INT NOT NULL,
-    order_date DATE NOT NULL,
-    total_price DECIMAL(10,2) NOT NULL,
-    payment_method VARCHAR(20) NOT NULL,
-    card_no VARCHAR(16),
-    order_delivered VARCHAR(20) DEFAULT 'pending',
-    PRIMARY KEY (order_id),
-    FOREIGN KEY (student_id) REFERENCES Student(student_id)
-);
+-- COMMIT;
 
 
-CREATE TABLE Orders_Book (
-    order_id INT,
-    book_id INT,
-    book_amount INT,
-    delivery_date DATE NOT NULL,
-    PRIMARY KEY (order_id, book_id),
-    FOREIGN KEY (book_id) REFERENCES Book(book_id)
-);
+-- CREATE TABLE Book (
+--     book_id INT,
+--     title VARCHAR(30) NOT NULL,
+--     author CHAR(30) NOT NULL,
+--     price DECIMAL(10,2) NOT NULL,
+--     amount INT NOT NULL,
+--     PRIMARY KEY (book_id));
 
-COMMIT;
+-- CREATE TABLE Student (
+--     student_id INT,
+--     name VARCHAR(30) NOT NULL,
+--     gender VARCHAR(30) NOT NULL,
+--     major VARCHAR(30) NOT NULL,
+--     discount DECIMAL(10,2) NOT NULL,
+--     PRIMARY KEY (student_id)
+-- );
+
+-- CREATE TABLE Orders (
+--     order_id INT,
+--     student_id INT NOT NULL,
+--     order_date DATE NOT NULL,
+--     total_price DECIMAL(10,2) NOT NULL,
+--     payment_method VARCHAR(20) NOT NULL,
+--     card_no VARCHAR(16),
+--     order_delivered VARCHAR(20) DEFAULT 'pending',
+--     PRIMARY KEY (order_id),
+--     FOREIGN KEY (student_id) REFERENCES Student(student_id)
+-- );
+
+
+-- CREATE TABLE Orders_Book (
+--     order_id INT,
+--     book_id INT,
+--     book_amount INT,
+--     delivery_date DATE NOT NULL,
+--     PRIMARY KEY (order_id, book_id),
+--     FOREIGN KEY (book_id) REFERENCES Book(book_id)
+-- );
+
+-- COMMIT;
 
 -- book alr exists
 
@@ -63,11 +63,11 @@ COMMIT;
 
 PROMPT INSERT Book TABLE;
 
-INSERT INTO Book VALUES (1, 'To Kill a Mockingbird', 'Harper Lee', 12.99, 50);
-INSERT INTO Book VALUES (2, '1984', 'George Orwell', 10.99, 30);
-INSERT INTO Book VALUES (3, 'Pride and Prejudice', 'Jane Austen', 8.99, 40);
-INSERT INTO Book VALUES (4, 'The Great Gatsby', 'F. Scott Fitzgerald', 11.99, 20);
-INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel García Márquez', 9.99, 60);
+INSERT INTO Book VALUES (1, 'To Kill a Mockingbird', 'Harper Lee', 180.99, 50);
+INSERT INTO Book VALUES (2, '1984', 'George Orwell', 200.05, 30);
+INSERT INTO Book VALUES (3, 'Pride and Prejudice', 'Jane Austen', 220.05, 40);
+INSERT INTO Book VALUES (4, 'The Great Gatsby', 'F. Scott Fitzgerald', 290.05, 20);
+INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel García Márquez', 300.05, 60);
 
 -- Insert into Student table
 PROMPT INSERT Student TABLE;
