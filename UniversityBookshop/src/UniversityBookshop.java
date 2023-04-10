@@ -986,7 +986,10 @@ public class UniversityBookshop {
 				
 				String answer = in.nextLine();
 				if (answer.equalsIgnoreCase("y")) {
-					// If y is pressed, reset the amount of books
+					i--  // Decrease the number of books ordered
+						
+						
+					// If y is pressed, record the original amount of books
 					int oldAmount = 0;
 					for (int j = 0; j < orders.size(); j++) {
 						if (orders.get(j).getBookId() == bookId) {
@@ -996,16 +999,16 @@ public class UniversityBookshop {
 					} 
 					// Get the updated number of books
 					System.out.print("New book amount: ");
-
+					
 					int newAmount = Integer.parseInt(in.nextLine());
-					in.nextLine(); // consume the remaining newline character
+// 					in.nextLine(); // consume the remaining newline character
 
 					// Check if there is enough stock of the book
 					if (newAmount > getAmount(bookId)) {
 						System.out.println("We don't have enough stock of this book. Sorry!");
 						continue;
 					} else {
-						// Update the amount of the book in the order
+						// If there are enough books, let them order and update the amount of the books in the order
 						for (BookOrder order : orders) {
 							if (order.getBookId() == bookId) {
 								order.bookAmount = newAmount;
@@ -1016,7 +1019,7 @@ public class UniversityBookshop {
 						// Get the price of the book by ID from the database
 						double book_price = getPriceByID(bookId);
 
-						// Calculate the total price difference for this book
+						// Calculate the total price difference for this book based on the changed amount
 						double book_total_price_diff = (newAmount * book_price) - (oldAmount * book_price);
 
 						// Add the total price difference for this book to the overall total price
@@ -1035,11 +1038,12 @@ public class UniversityBookshop {
 				System.out.print("➖Enter Book amount: " + "\n➖Available: " + stock + ": )");
 				int bookAmount = Integer.parseInt(in.nextLine());
 
-				if (stock == 0) {
+				if (stock == 0) { // If there are no more books in stock
 					System.out.println("We are out of stock for this book. Sorry!:");
 					return;
 				}
-				else if (bookAmount > stock) {
+				else if (bookAmount > stock) { 
+					// If the ordered amount is greater than the amount in stock, all books in stock are given to the user
 					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock
 							+ " left. We will add them all...");
 
@@ -1054,7 +1058,7 @@ public class UniversityBookshop {
 				// Get the price of the book by ID from the database
 				double book_price = getPriceByID(bookId);
 
-				// Calculate the total price for this book
+				// Calculate the total price for this book 
 				double book_total_price = bookAmount * book_price;
 
 				// Add the total price for this book to the overall total price
