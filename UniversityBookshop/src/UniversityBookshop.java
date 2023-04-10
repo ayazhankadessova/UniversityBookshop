@@ -990,11 +990,11 @@ public class UniversityBookshop {
 					int oldAmount = 0;
 					for (int j = 0; j < orders.size(); j++) {
 						if (orders.get(j).getBookId() == bookId) {
-							oldAmount = orders.get(i).getBookAmount();
+							oldAmount = orders.get(j).getBookAmount();
 							break;
 						}
 					} 
-
+					// Get the updated number of books
 					System.out.print("New book amount: ");
 
 					int newAmount = Integer.parseInt(in.nextLine());
