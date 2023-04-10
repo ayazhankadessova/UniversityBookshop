@@ -15,6 +15,10 @@ Before running the program, make sure to execute the BookShop.sql file on your O
 
 - Terminal: 
 
+```@ ./DropTables_BookShop.sql```
+
+```@ ./AddTables_BookShop.sql```
+
 ```@ ./BookShop.sql```
 
 ## Usage
