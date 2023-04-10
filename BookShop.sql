@@ -68,6 +68,11 @@ INSERT INTO Book VALUES (2, '1984', 'George Orwell', 200.05, 30);
 INSERT INTO Book VALUES (3, 'Pride and Prejudice', 'Jane Austen', 220.05, 40);
 INSERT INTO Book VALUES (4, 'The Great Gatsby', 'F. Scott Fitzgerald', 290.05, 20);
 INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel García Márquez', 300.05, 60);
+INSERT INTO Book VALUES (6, 'The Catcher in the Rye', 'J.D. Salinger', 240.99, 35);
+INSERT INTO Book VALUES (7, 'The Lord of the Rings', 'J.R.R. Tolkien', 350.99, 25);
+INSERT INTO Book VALUES (8, 'Brave New World', 'Aldous Huxley', 180.99, 30);
+INSERT INTO Book VALUES (9, 'Animal Farm', 'George Orwell', 150.05, 50);
+INSERT INTO Book VALUES (10, 'The Hobbit', 'J.R.R. Tolkien', 170.05, 45);
 
 -- Insert into Student table
 PROMPT INSERT Student TABLE;
@@ -75,6 +80,12 @@ INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 0.00);
 INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 0.00);
 INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 0.00);
 INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.00);
+INSERT INTO Student VALUES (5, 'Michael Kim', 'Male', 'Mathematics', 0.00);
+INSERT INTO Student VALUES (6, 'Jessica Lee', 'Female', 'Chemistry', 0.00);
+INSERT INTO Student VALUES (7, 'Daniel Rodriguez', 'Male', 'Physics', 0.00);
+INSERT INTO Student VALUES (8, 'Avery Taylor', 'Female', 'Psychology', 0.00);
+INSERT INTO Student VALUES (9, 'Kevin Patel', 'Male', 'Economics', 0.00);
+INSERT INTO Student VALUES (10, 'Sophia Kim', 'Female', 'Sociology', 0.00);
 
 -- Insert into Orders table
 -- PROMPT INSERT Orders TABLE;
