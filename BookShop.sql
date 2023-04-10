@@ -108,7 +108,7 @@ COMMIT;
 
 
 -- to check again
--- Check if there is credit card when payment opton is credit card
+-- Check if there is credit card when payment option is credit card
 CREATE OR REPLACE TRIGGER check_credit_card
 BEFORE INSERT ON Orders
 FOR EACH ROW
@@ -138,7 +138,6 @@ BEGIN
 END;
 /
 
--- done
 -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER update_total_price_and_amount
 AFTER INSERT ON Orders_Book
@@ -155,6 +154,7 @@ BEGIN
 END;
 /
 
+-- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
 CREATE OR REPLACE TRIGGER add_book_amount
 AFTER DELETE ON Orders_Book
 FOR EACH ROW
