@@ -533,8 +533,8 @@ public class UniversityBookshop {
 
 			ResultSet rs = stm.executeQuery(sql);
 
-			while (rs.next()) { // this is the result record iterator, see the
-
+			while (rs.next()) { 
+				// call function to find the order based on order_id
 				orderSearchbyID(rs.getInt(1));
 				System.out.println("============================================");
 
@@ -563,9 +563,9 @@ public class UniversityBookshop {
 			////System.out.println(sql);
 
 			ResultSet rs = stm.executeQuery(sql);
-
-			while (rs.next()) { // this is the result record iterator, see the
-
+			// show the books one by one
+			while (rs.next()) { 
+				
 				diplayBook(rs.getInt(1));
 				System.out.println("📚============================================📚");
 				//
@@ -589,12 +589,13 @@ public class UniversityBookshop {
 
 			ResultSet rs = stm.executeQuery(sql);
 
-			while (rs.next()) { // this is the result record iterator, see the
+			while (rs.next()) { 
 
 				String[] heads = { "book_id", "title", "author", "price", "amount" };
 
 				for (int i = 0; i < 5; ++i) {
 					try {
+						// Print the relevant data
 						System.out.println(heads[i] + " : " + rs.getString(i + 1));
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -621,6 +622,7 @@ public class UniversityBookshop {
 		try {
 
 			Statement stm = conn.createStatement();
+			// Find the total price for each order_id
 			String sql = "SELECT total_price FROM Orders WHERE order_id = " + order_id;
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
@@ -628,6 +630,7 @@ public class UniversityBookshop {
 			String[] heads = { " 🧳 total_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
+					// Find all the prices and print them
 					result = rs.getDouble(i + 1);
 					System.out.println(heads[i] + " : " + result);
 					// System.out.print(result);
@@ -652,7 +655,8 @@ public class UniversityBookshop {
 
 		try {
 			Statement stm = conn.createStatement();
-
+			
+			// Calculate discount if total price > 1000 or if total price > 2000
 			String sql = "UPDATE Student\n" +
 					"SET discount = (\n" +
 					"  CASE\n" +
@@ -705,10 +709,11 @@ public class UniversityBookshop {
 				System.out.println("Student ID " + student_id + " exists in the database.");
 				return student_id; // exit the method and return the valid student ID
 			} else {
+				// if student ID does not exist
 				System.out.println("Student ID " + student_id + " does not exist in the database.");
 
 				// prompt the user to enter a new student ID or exit the program
-				System.out.println("Would you like to enter a new student ID? (Y/N)");
+				System.out.println("Press 'N' to escape or press any other key to enter a new student ID");
 				line = in.nextLine();
 
 				if (line.equalsIgnoreCase("N")) {
@@ -731,20 +736,21 @@ public class UniversityBookshop {
 			String line = in.nextLine();
 			int order_id = Integer.parseInt(line);
 
-			// check if the student ID exists in the database
+			// check if the order ID exists in the database
 			if (checkOrder(order_id)) {
 				System.out.println("Order ID " + order_id + " exists in the database.");
 				return order_id; // exit the method and return the valid student ID
 			} else {
+				// If order ID does not exist
 				System.out.println("Order ID " + order_id + " does not exist in the database.");
 
 				// prompt the user to enter a new student ID or exit the program
-				System.out.println("Would you like to enter a new Order ID? (Y/N)");
+				System.out.println("Press 'N' to escape or press any other key to enter a new order ID");
 				line = in.nextLine();
 
 				if (line.equalsIgnoreCase("N")) {
-					// exit the method without returning a valid student ID
-					return -1; // or any other invalid value to indicate no valid student ID was entered
+					// exit the method without returning a valid order ID
+					return -1; // or any other invalid value to indicate no valid order ID was entered
 				}
 			}
 		}
@@ -757,7 +763,8 @@ public class UniversityBookshop {
 	public boolean checkStudentId(int student_id) {
 		try {
 			Statement stm = conn.createStatement();
-
+			
+			// check if student_id exists
 			String sql = "SELECT * FROM Student WHERE Student_id = " + student_id;
 
 			////System.out.println(sql);
@@ -766,15 +773,16 @@ public class UniversityBookshop {
 
 			boolean exists = result.next();
 
-			if (!exists) {
+			if (!exists) { // if Student ID does not exist
 				System.out.println("No such Student ID exists in the database.");
 			}
-
+			
 			stm.close();
 			result.close();
-
+			
 			return exists;
 		} catch (SQLException e) {
+			// If there is any exception, return false
 			e.printStackTrace();
 			return false;
 		}
@@ -788,22 +796,23 @@ public class UniversityBookshop {
 	public boolean allDelivered(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
-
+			
+			// check if order_id exists and the delivery date has not been passed for some books
 			String sql = "SELECT * FROM Orders_Book WHERE delivery_date > SYSDATE AND order_id = " + order_id;
 
-			////System.out.println(sql);
-
+			//System.out.println(sql);
+			
 			ResultSet result = stm.executeQuery(sql);
 
 			boolean exists = result.next();
 
-			if (exists) {
+			if (exists) { // If orders have still not been delivered
 				System.out.println("There are still pending orders.");
 			}
 
 			stm.close();
 			result.close();
-
+			
 			return !exists;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -819,7 +828,8 @@ public class UniversityBookshop {
 	public boolean allNOTDelivered(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
-
+			
+			// check if order_id exists and the delivery date has already passed for some books
 			String sql = "SELECT * FROM Orders_Book WHERE delivery_date <= SYSDATE AND order_id = " + order_id;
 
 			////System.out.println(sql);
@@ -828,7 +838,7 @@ public class UniversityBookshop {
 
 			boolean exists = result.next();
 
-			if (exists) {
+			if (exists) { // If some books have been delivered
 				System.out.println("There are delivered orders...");
 			}
 
@@ -848,14 +858,14 @@ public class UniversityBookshop {
 	public void updateOrder(int order_id) {
 		try {
 			Statement stm = conn.createStatement();
-
-			if (allDelivered(order_id)) {
+			
+			if (allDelivered(order_id)) { // If all the books have been delivered
 				System.out.println("All books in order " + order_id + " have been delivered.");
-			} else {
+			} else { // If not all books have been delivered, return
 				// System.out.println("There are still pending orders.");
 				return;
 			}
-
+			// Order is updated to 'delivered' if all books have been delivered
 			String sql = "UPDATE Orders SET order_delivered = 'delivered' WHERE order_id = " + order_id;
 
 			////System.out.println(sql);
@@ -863,7 +873,7 @@ public class UniversityBookshop {
 			stm.executeUpdate(sql);
 
 			stm.close();
-
+			
 			System.out.println("succeed to update order " + order_id);
 
 		} catch (SQLException e) {
@@ -877,7 +887,7 @@ public class UniversityBookshop {
 	 * update all orders every time we run the program
 	 */
 	public void update() {
-
+		
 		System.out.println("All orders in the database now:");
 		try {
 			Statement stm = conn.createStatement();
@@ -886,8 +896,8 @@ public class UniversityBookshop {
 
 			ResultSet rs = stm.executeQuery(sql);
 
-			while (rs.next()) { // this is the result record iterator, see the
-
+			while (rs.next()) { 
+				// update information about all the orders, i.e. check whether they have been delivered each time after the program is run
 				updateOrder(rs.getInt(1));
 				System.out.println("============================================");
 
@@ -910,18 +920,21 @@ public class UniversityBookshop {
 		/**
 		 * A sample input is:
 		 */
+		// Call function to get student ID
 		int student_id = askForStudentId();
 
 		if (student_id == -1) {
+			// If input is -1, return
 			System.out.println("No valid student ID was entered. Exiting the order placement process.");
 			return;
 		}
 
 		// check if have outstanding order
 		if (outstandingOrderSearchbyStudentID(student_id)) {
+			// Return if they have outstanding orders
 			System.out.println("You have outstanding order. Please wait.");
 			return;
-		} else {
+		} else { // Allow them to order if there is no outstanding order
 			System.out.println("You don't have outstanding order. You can place order now.");
 		}
 
@@ -937,7 +950,8 @@ public class UniversityBookshop {
 		System.out.println("Order ID: " + order_id);
 
 		System.out.println("👋 Welcome to our bookshop! Here are our Books: ");
-
+		
+		// display all the books in the Books table, with their title, quantity, amount and price
 		displayBooks();
 
 		// Prompt the user to enter the number of different books to order
@@ -945,6 +959,7 @@ public class UniversityBookshop {
 
 		int numBooks = Integer.parseInt(in.nextLine());
 
+		// To calculate the total price of all the books ordered
 		double total_price = 0;
 
 		// Create an ArrayList to record successful book orders
@@ -955,39 +970,45 @@ public class UniversityBookshop {
 		// book ID and amount for each book
 		for (int i = 1; i <= numBooks; i++) {
 			System.out.println("Enter information for book " + i + "....");
-
+			
+			// Ask for the bookId you want to order
 			int bookId = askBookId();
-
-			if (bookId == -1) {
+			
+			if (bookId == -1) { // If the input is -1, return
 				System.out.println("No valid book ID was entered. Exiting the order placement process.");
 				return;
 			}
 
 			// Check if the book ID is already in the order
-			if (addedBookIds.contains(bookId)) {
+			if (addedBookIds.contains(bookId)) { // 
+				// If the bookId is already in the order, ask the user whether they want to change the amount
 				System.out.println("This book is already in your order. Do you want to change the amount? (y/n)");
-
+				
 				String answer = in.nextLine();
 				if (answer.equalsIgnoreCase("y")) {
+					i--;  // Decrease the number of books ordered
+						
+						
+					// If y is pressed, record the original amount of books
 					int oldAmount = 0;
-					for (int j = 0; i < orders.size(); i++) {
-						if (orders.get(i).getBookId() == bookId) {
-							oldAmount = orders.get(i).getBookAmount();
+					for (int j = 0; j < orders.size(); j++) {
+						if (orders.get(j).getBookId() == bookId) {
+							oldAmount = orders.get(j).getBookAmount();
 							break;
 						}
-					}
-
+					} 
+					// Get the updated number of books
 					System.out.print("New book amount: ");
-
+					
 					int newAmount = Integer.parseInt(in.nextLine());
-					in.nextLine(); // consume the remaining newline character
+// 					in.nextLine(); // consume the remaining newline character
 
 					// Check if there is enough stock of the book
 					if (newAmount > getAmount(bookId)) {
 						System.out.println("We don't have enough stock of this book. Sorry!");
 						continue;
 					} else {
-						// Update the amount of the book in the order
+						// If there are enough books, let them order and update the amount of the books in the order
 						for (BookOrder order : orders) {
 							if (order.getBookId() == bookId) {
 								order.bookAmount = newAmount;
@@ -998,7 +1019,7 @@ public class UniversityBookshop {
 						// Get the price of the book by ID from the database
 						double book_price = getPriceByID(bookId);
 
-						// Calculate the total price difference for this book
+						// Calculate the total price difference for this book based on the changed amount
 						double book_total_price_diff = (newAmount * book_price) - (oldAmount * book_price);
 
 						// Add the total price difference for this book to the overall total price
@@ -1017,11 +1038,12 @@ public class UniversityBookshop {
 				System.out.print("➖Enter Book amount: " + "\n➖Available: " + stock + ": )");
 				int bookAmount = Integer.parseInt(in.nextLine());
 
-				if (stock == 0) {
+				if (stock == 0) { // If there are no more books in stock
 					System.out.println("We are out of stock for this book. Sorry!:");
 					return;
 				}
-				else if (bookAmount > stock) {
+				else if (bookAmount > stock) { 
+					// If the ordered amount is greater than the amount in stock, all books in stock are given to the user
 					System.out.println("We don't have enough stock of this book. Sorry! We only have " + stock
 							+ " left. We will add them all...");
 
@@ -1036,7 +1058,7 @@ public class UniversityBookshop {
 				// Get the price of the book by ID from the database
 				double book_price = getPriceByID(bookId);
 
-				// Calculate the total price for this book
+				// Calculate the total price for this book 
 				double book_total_price = bookAmount * book_price;
 
 				// Add the total price for this book to the overall total price
@@ -1052,10 +1074,10 @@ public class UniversityBookshop {
 		if (orders.size() > 0)
 
 		{
-
+			// Find the discount and update total price accordingly
 			double discount = getDiscount(student_id);
 			total_price = total_price * (1 - discount);
-
+			
 			System.out.println("Your total is... " + total_price);
 			// Ask if the user wants to pay
 			System.out.println("Do you want to proceed with payment? (Y/N)");
@@ -1064,7 +1086,8 @@ public class UniversityBookshop {
 			// Check the answer
 			if (answer.equalsIgnoreCase("Y")) {
 				boolean paymentSuccess = false;
-				while (!paymentSuccess) {
+				while (!paymentSuccess) { 
+					// Prompt 
 					String[] payment_result = getPaymentInfo();
 					String payment_method = payment_result[0];
 					String card_no = payment_result[1];
