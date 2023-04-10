@@ -159,14 +159,14 @@ CREATE OR REPLACE TRIGGER add_book_amount
 AFTER DELETE ON Orders_Book
 FOR EACH ROW
 DECLARE
-  v_book_amount NUMBER;
+v_book_amount NUMBER;
 BEGIN
-  v_book_amount := :OLD.book_amount;
+v_book_amount := (SELECT book_amount FROM Orders_Book WHERE order_id = :OLD.order_id AND book_id = :OLD.book_id);
 
-  -- Add book amount back
-  UPDATE Book
-  SET amount = amount + v_book_amount
-  WHERE book_id = :OLD.book_id;
+-- Add book amount back
+UPDATE Book
+SET amount = amount + v_book_amount
+WHERE book_id = :OLD.book_id;
 END;
 /
 
