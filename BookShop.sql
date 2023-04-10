@@ -160,52 +160,6 @@ END;
 /
 
 
-  -- -- Check if the order exists
-  -- SELECT COUNT(*) INTO v_order_count FROM Orders WHERE order_id = :NEW.order_id;
-
-  -- -- -- Insert into Orders table if it doesn't exist
-  -- -- IF v_order_count = 0 THEN
-  -- --   INSERT INTO Orders
-  -- --   VALUES (:NEW.order_id, 2, SYSDATE, 0, 'CASH', NULL);
-  -- -- END IF;
-
-  -- -- -- -- -- Update total price in Orders table
-  -- -- UPDATE Orders
-  -- -- SET total_price = total_price + (SELECT SUM(Book.price * v_book_amount)
-  -- --                    FROM Book
-  -- --                    WHERE Book.book_id = :NEW.book_id)
-  -- -- WHERE order_id = :NEW.order_id;
-
--- Create a trigger to check if we can cancel order:
--- 1. Order has to be made in recent 7 days
--- 2. No books have already been delivered
--- all checked in jdbc :)
--- CREATE OR REPLACE TRIGGER check_order_cancel
--- BEFORE DELETE ON Orders
--- FOR EACH ROW
--- DECLARE
---     order_age NUMBER;
---     book_delivered NUMBER;
---     v_order_date DATE;
--- BEGIN
-
---     -- order_age := :OLD.order_date - SYSDATE;
-
---     -- IF order_age > 7 THEN
---     --     RAISE_APPLICATION_ERROR(-20001, 'Cannot cancel order: order was made more than 7 days ago');
---     -- END IF;
-    
---     -- Check if any book has been delivered
---     -- SELECT COUNT(*) INTO book_delivered
---     -- FROM Orders_Book
---     -- WHERE order_id = :OLD.order_id AND delivery_date > SYSDATE;
-
---     -- IF book_delivered > 0 THEN
---     --     RAISE_APPLICATION_ERROR(-20002, 'Cannot cancel order: some books have already been delivered');
---     -- END IF;
--- END;
--- /
-
 COMMIT;
 
 SET AUTOCOMMIT ON
