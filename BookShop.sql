@@ -97,7 +97,7 @@ BEGIN
 END;
 /
 
--- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
+-- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order} change
 CREATE OR REPLACE TRIGGER add_book_amount
 AFTER DELETE ON Orders_Book
 FOR EACH ROW
@@ -112,6 +112,7 @@ SET amount = amount + v_book_amount
 WHERE book_id = :OLD.book_id;
 END;
 /
+
 
 
 COMMIT;
