@@ -986,7 +986,7 @@ public class UniversityBookshop {
 				
 				String answer = in.nextLine();
 				if (answer.equalsIgnoreCase("y")) {
-					i--  // Decrease the number of books ordered
+					i--;  // Decrease the number of books ordered
 						
 						
 					// If y is pressed, record the original amount of books
@@ -1074,10 +1074,10 @@ public class UniversityBookshop {
 		if (orders.size() > 0)
 
 		{
-
+			// Find the discount and update total price accordingly
 			double discount = getDiscount(student_id);
 			total_price = total_price * (1 - discount);
-
+			
 			System.out.println("Your total is... " + total_price);
 			// Ask if the user wants to pay
 			System.out.println("Do you want to proceed with payment? (Y/N)");
@@ -1086,7 +1086,8 @@ public class UniversityBookshop {
 			// Check the answer
 			if (answer.equalsIgnoreCase("Y")) {
 				boolean paymentSuccess = false;
-				while (!paymentSuccess) {
+				while (!paymentSuccess) { 
+					// Prompt 
 					String[] payment_result = getPaymentInfo();
 					String payment_method = payment_result[0];
 					String card_no = payment_result[1];
