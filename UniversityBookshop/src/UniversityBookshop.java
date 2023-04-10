@@ -1482,50 +1482,7 @@ public class UniversityBookshop {
 		}
 	}
 
-	/**
-	 * Please fill in this function to delete a flight.
-	 */
-	// public void deleteFlight() {
-	// listAllFlights();
-	// System.out.println("Please input the flight_no to delete:");
-	// String line = in.nextLine();
 
-	// if (line.equalsIgnoreCase("exit"))
-	// return;
-	// line = line.trim();
-
-	// try {
-	// Statement stm = conn.createStatement();
-
-	// String sql = "Delete from FLIGHTS " + "Where Flight_no = '" + line + "'";
-
-	// System.out.println(sql);
-
-	// /*
-	// * Formuate your own SQL query:
-	// *
-	// * sql = "...";
-	// *
-	// */
-
-	// stm.executeUpdate(sql); // please pay attention that we use
-	// // executeUpdate to update the database
-
-	// stm.close();
-
-	// /*
-	// * You may uncomment the statement below after formulating the SQL
-	// * query above
-	// *
-	// * System.out.println("succeed to delete flight " + line);
-	// *
-	// */
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// System.out.println("fail to delete flight " + line);
-	// noException = false;
-	// }
-	// }
 
 	/**
 	 * Close the manager. Do not change this function.
@@ -1545,7 +1502,7 @@ public class UniversityBookshop {
 	}
 
 	/**
-	 * Constructor of flight manager Do not change this function.
+	 * Constructor of University Bookshop.
 	 */
 	public UniversityBookshop() {
 		System.out.println("Welcome to use this manager!");
