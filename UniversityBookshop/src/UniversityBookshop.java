@@ -861,10 +861,8 @@ public class UniversityBookshop {
 			
 			if (allDelivered(order_id)) { // If all the books have been delivered
 				System.out.println("All books in order " + order_id + " have been delivered.");
-			} else { // If not all books have been delivered, return
-				// System.out.println("There are still pending orders.");
-				return;
-			}
+			} 
+			
 			// Order is updated to 'delivered' if all books have been delivered
 			String sql = "UPDATE Orders SET order_delivered = 'delivered' WHERE order_id = " + order_id;
 
