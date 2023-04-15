@@ -180,8 +180,8 @@ public class UniversityBookshop {
 	 * @return boolean
 	 */
 	public boolean loginDB() {
-		String username = "f1201633";// Replace to your username
-		String password = "f1201633";// Replace to your password
+		String username = "***REMOVED***";// Replace to your username
+		String password = "***REMOVED***";// Replace to your password
 
 		/* Do not change the code below */
 		if (username.equalsIgnoreCase("e1234567") || password.equalsIgnoreCase("e1234567")) {
@@ -948,8 +948,10 @@ public class UniversityBookshop {
 		int order_id = 0;
 		Random rand = new Random();
 
+		System.out.println("Assigning Order ID...");
 		do {
 			order_id = rand.nextInt(9001) + 1000; // Generate a random order ID between 1000 and 10000
+			System.out.println("Generated order ID: " + order_id);
 		} while (checkOrder(order_id)); // Keep looping while the order ID is already taken
 
 		System.out.println("Order ID: " + order_id);
@@ -961,9 +963,22 @@ public class UniversityBookshop {
 		displayBooks();
 
 		// Prompt the user to enter the number of different books to order
-		System.out.print("How many different books would you like to order? ");
+		System.out.print("How many different books would you like to order? Max is 10");
 
-		int numBooks = Integer.parseInt(in.nextLine());
+		int numBooks = 0;
+
+		while (true) {
+			System.out.print("Enter the number of books (1-10, or -1 to exit): ");
+			numBooks = Integer.parseInt(in.nextLine());
+
+			if (numBooks == -1) {
+				break;
+			} else if (numBooks < 1 || numBooks > 10) {
+				System.out.println("Invalid input. Please enter a number between 1 and 10, or -1 to exit.");
+			} else {
+				break;
+			}
+		}
 
 		// To calculate the total price of all the books ordered
 		double total_price = 0;
@@ -1153,7 +1168,7 @@ public class UniversityBookshop {
 
 			// String sql = "INSERT INTO Orders_Book VALUES (" + order_id + "," + bookId +
 			// "," + bookAmount + ","
-			// + "'23-APR-2023')";
+			// + "'23-MAR-2023')";
 
 			//// System.out.println(sql);
 
@@ -1210,12 +1225,50 @@ public class UniversityBookshop {
 		}
 	}
 
-	/* Cancel Order */
-	public String cancelOrder(int order_id) {
+	public boolean deletefromOrdersBook(int order_id) throws SQLException {
 
 		try {
 			Statement stm = conn.createStatement();
 
+			// Check for order to delete using order_id
+			String sql = "DELETE FROM Orders_Book WHERE order_id = " + order_id;
+
+			//// System.out.println(sql);
+
+			stm.executeUpdate(sql);
+
+			stm.close();
+
+			System.out.println("succeed to delete from Order_Book " + order_id);
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("fail to delete order Order_Book" + order_id);
+			return false;
+			// noException = false;
+			// return "error";
+		}
+	}
+
+	public String cancelOrder(int order_id) {
+
+		try {
+			Statement stm = conn.createStatement();
+			// if (deletefromOrdersBook(order_id)) {
+			// // Check for order to delete using order_id
+			// String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
+
+			// //// System.out.println(sql);
+
+			// stm.executeUpdate(sql);
+
+			// stm.close();
+
+			// System.out.println("succeed to delete Order " + order_id);
+			// return "success";
+
+			// }
 			// Check for order to delete using order_id
 			String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
 
@@ -1227,6 +1280,18 @@ public class UniversityBookshop {
 
 			System.out.println("succeed to delete Order " + order_id);
 			return "success";
+
+			// // Check for order to delete using order_id
+			// String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
+
+			// //// System.out.println(sql);
+
+			// stm.executeUpdate(sql);
+
+			// stm.close();
+
+			// System.out.println("succeed to delete Order " + order_id);
+			// return "success";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1244,6 +1309,7 @@ public class UniversityBookshop {
 		/**
 		 * A sample input is:
 		 */
+		int student_id = askForStudentId();
 		int order_id = askForOrderId();
 
 		if (order_id == -1) { // Return if the input is -1 for order_id
@@ -1281,6 +1347,8 @@ public class UniversityBookshop {
 				return;
 			} else { // If there are no errors, cancel order
 				System.out.println("Order cancelled successfully!");
+				updateDiscount(student_id);
+
 			}
 		} else { // If user does not press 'Y'
 			System.out.println("You have chosen not to cancel the order.");

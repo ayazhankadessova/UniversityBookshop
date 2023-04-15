@@ -1,6 +1,63 @@
+-- PROMPT DROP TABLES;
+
+-- DROP TABLE Book CASCADE CONSTRAINT;
+-- DROP TABLE Student CASCADE CONSTRAINT;
+-- DROP TABLE Orders CASCADE CONSTRAINT;
+-- DROP TABLE Orders_Book CASCADE CONSTRAINT;
+
+-- COMMIT;
+
+
+-- CREATE TABLE Book (
+--     book_id INT,
+--     title VARCHAR(30) NOT NULL,
+--     author CHAR(30) NOT NULL,
+--     price DECIMAL(10,2) NOT NULL,
+--     amount INT NOT NULL,
+--     PRIMARY KEY (book_id));
+
+-- CREATE TABLE Student (
+--     student_id INT,
+--     name VARCHAR(30) NOT NULL,
+--     gender VARCHAR(30) NOT NULL,
+--     major VARCHAR(30) NOT NULL,
+--     discount DECIMAL(10,2) NOT NULL,
+--     PRIMARY KEY (student_id)
+-- );
+
+-- CREATE TABLE Orders (
+--     order_id INT,
+--     student_id INT NOT NULL,
+--     order_date DATE NOT NULL,
+--     total_price DECIMAL(10,2) NOT NULL,
+--     payment_method VARCHAR(20) NOT NULL,
+--     card_no VARCHAR(16),
+--     order_delivered VARCHAR(20) DEFAULT 'pending',
+--     PRIMARY KEY (order_id),
+--     FOREIGN KEY (student_id) REFERENCES Student(student_id)
+-- );
+
+
+-- CREATE TABLE Orders_Book (
+--     order_id INT,
+--     book_id INT,
+--     book_amount INT,
+--     delivery_date DATE NOT NULL,
+--     PRIMARY KEY (order_id, book_id),
+--     FOREIGN KEY (book_id) REFERENCES Book(book_id)
+-- );
+
+-- COMMIT;
+
+-- book alr exists
+
+-- ALTER TABLE Orders_Book
+-- ADD CONSTRAINT FK_ORDERS_BOOK_BOOK_ID
+-- FOREIGN KEY (book_id) REFERENCES Book(book_id) INITIALLY DEFERRED DEFERRABLE;
+
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
-FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
+FOREIGN KEY (order_id) REFERENCES Orders(order_id) INITIALLY DEFERRED DEFERRABLE;
 
 COMMIT;
 
@@ -97,22 +154,21 @@ BEGIN
 END;
 /
 
--- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order} change
+-- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
 CREATE OR REPLACE TRIGGER add_book_amount
 AFTER DELETE ON Orders_Book
 FOR EACH ROW
 DECLARE
-v_book_amount NUMBER;
+  v_book_amount NUMBER;
 BEGIN
-v_book_amount := (SELECT book_amount FROM Orders_Book WHERE order_id = :OLD.order_id AND book_id = :OLD.book_id);
+  v_book_amount := :OLD.book_amount;
 
--- Add book amount back
-UPDATE Book
-SET amount = amount + v_book_amount
-WHERE book_id = :OLD.book_id;
+  -- Add book amount back
+  UPDATE Book
+  SET amount = amount + v_book_amount
+  WHERE book_id = :OLD.book_id;
 END;
 /
-
 
 
 COMMIT;
