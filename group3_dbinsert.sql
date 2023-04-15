@@ -107,27 +107,38 @@ END;
 
 CREATE OR REPLACE TRIGGER update_student_discount
 AFTER INSERT ON Orders
-FOR EACH ROW
+-- FOR EACH ROW
 DECLARE
-  v_total_price DECIMAL(10,2);
+  a NUMBER;
+  id NUMBER;
+  CURSOR tran_cursor IS
+    SELECT stu_id FROM TRAN;
 BEGIN
-  SELECT SUM(total_price)
-  INTO v_total_price
-  FROM Orders
-  WHERE student_id = :NEW.student_id
-    AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
-
-  UPDATE Student
-  SET discount = (
-    CASE
-      WHEN v_total_price > 2000 THEN 0.20
-      WHEN v_total_price > 1000 THEN 0.10
-      ELSE 0
-    END
-  )
-  WHERE student_id = :NEW.student_id;
+  OPEN tran_cursor;
+  LOOP
+    FETCH tran_cursor INTO id;
+    EXIT WHEN tran_cursor%NOTFOUND;
+    
+    -- Do something with the student ID
+    DBMS_OUTPUT.PUT_LINE('Processing student ID: ' || id);
+    
+    -- Update the student's discount based on their total spend
+    -- (this is just an example, you would need to modify it to match your requirements)
+    UPDATE Student
+    SET discount =
+      CASE
+        WHEN (SELECT SUM(total_price) FROM Orders WHERE student_id = id AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)) > 2000 THEN 0.20
+        WHEN (SELECT SUM(total_price) FROM Orders WHERE student_id = id AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)) > 1000 THEN 0.10
+        ELSE 0
+      END
+    WHERE student_id = id;
+  END LOOP;
+  
+  CLOSE tran_cursor;
 END;
 /
+
+
 
 
 
@@ -147,21 +158,54 @@ BEGIN
 END;
 /
 
--- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
+-- -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
+-- CREATE OR REPLACE TRIGGER update_total_price_and_amount
+-- AFTER INSERT ON Orders_Book
+-- FOR EACH ROW
+-- DECLARE
+--   v_book_amount NUMBER;
+-- BEGIN
+--   v_book_amount := :NEW.book_amount;
+
+--   -- Update book amount
+--   UPDATE Book
+--   SET amount = amount - v_book_amount
+--   WHERE book_id = :NEW.book_id;
+-- END;
+-- /
+
 CREATE OR REPLACE TRIGGER update_total_price_and_amount
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
   v_book_amount NUMBER;
+  v_total_price DECIMAL(10,2);
 BEGIN
-  v_book_amount := :NEW.book_amount;
-
   -- Update book amount
+  v_book_amount := :NEW.book_amount;
   UPDATE Book
   SET amount = amount - v_book_amount
   WHERE book_id = :NEW.book_id;
+
+  -- Calculate student discount
+  SELECT SUM(total_price)
+  INTO v_total_price
+  FROM Orders
+  WHERE student_id = :NEW.student_id
+    AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
+
+  UPDATE Student
+  SET discount = (
+    CASE
+      WHEN v_total_price > 2000 THEN 0.20
+      WHEN v_total_price > 1000 THEN 0.10
+      ELSE 0
+    END
+  )
+  WHERE student_id = :NEW.student_id;
 END;
 /
+
 
 -- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
 CREATE OR REPLACE TRIGGER add_book_amount
