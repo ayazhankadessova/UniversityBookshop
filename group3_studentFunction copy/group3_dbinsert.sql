@@ -144,6 +144,8 @@ DECLARE
   v_student_id Orders.student_id%TYPE;
   v_total_price DECIMAL(10,2);
 BEGIN
+
+
   v_student_id := :NEW.student_id;
   
   SELECT SUM(total_price) + :NEW.total_price
@@ -151,6 +153,9 @@ BEGIN
   FROM Orders_Total
   WHERE student_id = v_student_id
     AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
+
+  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_price);
+
   
   UPDATE Student
   SET discount = (
