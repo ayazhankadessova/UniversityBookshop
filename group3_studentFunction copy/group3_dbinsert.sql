@@ -18,8 +18,8 @@ CREATE TABLE Student (
 CREATE TABLE Orders (
     order_id INT,
     student_id INT NOT NULL,
-    -- order_date DATE NOT NULL,
-    -- total_price DECIMAL(10,2) NOT NULL,
+    order_date DATE NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(20) NOT NULL,
     card_no VARCHAR(16),
     order_delivered VARCHAR(20) DEFAULT 'pending',
@@ -28,10 +28,12 @@ CREATE TABLE Orders (
 );
 
 CREATE TABLE Orders_Total (
+    order_id INT,
     student_id INT NOT NULL,
     order_date DATE NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (order_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id)
 );
 
 
@@ -51,6 +53,11 @@ ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
 FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
 
 
+COMMIT;
+
+ALTER TABLE Orders_Total 
+ADD CONSTRAINT FK_ORDERS_Total_ORDER_ID
+FOREIGN KEY (order_id) REFERENCES Orders(order_id) INITIALLY DEFERRED DEFERRABLE;
 COMMIT;
 
 PROMPT INSERT Book TABLE;
@@ -130,22 +137,21 @@ END;
 /
 
 
-CREATE OR REPLACE TRIGGER update_total_price_and_amount
-AFTER INSERT OR UPDATE ON Orders
+CREATE OR REPLACE TRIGGER update_student_discount
+AFTER INSERT ON Orders
 FOR EACH ROW
 DECLARE
-  v_student_id INT;
+  v_student_id Orders.student_id%TYPE;
   v_total_price DECIMAL(10,2);
 BEGIN
   v_student_id := :NEW.student_id;
-
-  -- Update student discount
-  SELECT SUM(total_price)
+  
+  SELECT SUM(total_price) + :NEW.total_price
   INTO v_total_price
   FROM Orders_Total
   WHERE student_id = v_student_id
-    AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
-
+    AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
+  
   UPDATE Student
   SET discount = (
     CASE
@@ -157,6 +163,7 @@ BEGIN
   WHERE student_id = v_student_id;
 END;
 /
+
 
 
 -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table

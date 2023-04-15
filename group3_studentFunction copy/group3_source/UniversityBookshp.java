@@ -1118,13 +1118,10 @@ public class UniversityBookshop {
 
                     try {
                         String insertResult = insertOrder(order_id, student_id, total_price, payment_method, card_no);
-                        if (insertResult.equals("error")) { // Allow them to try again if there is an error in payment
-                            System.out.println("Invalid. Do you want to try again? (Y/N)");
-                            String response = in.nextLine();
-                            if (!response.equalsIgnoreCase("Y")) { // If input is not 'Y', return
-                                return;
-                            }
-                        } else { // If payment is successful
+                        String insertResult2 = insertOrder2(order_id, student_id, total_price);
+
+                        if (insertResult.equals("success") && insertResult2.equals("success")) { // If payment is
+                                                                                                 // successful
                             System.out.println("Payment successful!");
                             paymentSuccess = true;
                             for (BookOrder order : orders) {
@@ -1133,6 +1130,15 @@ public class UniversityBookshop {
                                 } catch (SQLException e) {
                                     System.out.println("Error inserting book order details: " + e.getMessage());
                                 }
+                            }
+                        } else if (insertResult.equals("error") || insertResult2.equals("error")) { // Allow them to try
+                                                                                                    // again
+                            // if there is an error in
+                            // payment
+                            System.out.println("Invalid. Do you want to try again? (Y/N)");
+                            String response = in.nextLine();
+                            if (!response.equalsIgnoreCase("Y")) { // If input is not 'Y', return
+                                return;
                             }
                         }
 
@@ -1146,7 +1152,7 @@ public class UniversityBookshop {
                 System.out.println("Payment cancelled. Order not placed.");
             }
 
-            updateDiscount(student_id);
+            // updateDiscount(student_id);
         } else { // If the order size is zero or less
             System.out.println("No books were added to the order. Exiting the order placement process.");
         }
@@ -1197,18 +1203,16 @@ public class UniversityBookshop {
         try {
             Statement stm = conn.createStatement();
 
-            String sql2 = "INSERT INTO Orders (order_id, student_id, payment_method, card_no) "
+            String sql = "INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no) "
                     +
-                    "VALUES (" + order_id + ", " + student_id + ", '" + payment_method
+                    "VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ", '" + payment_method
                     + "', '" + card_no + "')";
 
-            stm.executeUpdate(sql2);
+            stm.executeUpdate(sql);
 
             stm.close();
 
-            System.out.println("succeed to insert Order_Total " + order_id);
-
-            insertOrder2(student_id, total_price);
+            System.out.println("succeed to insert Order  " + order_id);
 
             // If order is added return success
             return "success";
@@ -1224,7 +1228,7 @@ public class UniversityBookshop {
     /*
      * Insert Order
      */
-    public String insertOrder2(int student_id, double total_price)
+    public String insertOrder2(int order_id, int student_id, double total_price)
             throws SQLException {
 
         try {
@@ -1233,8 +1237,8 @@ public class UniversityBookshop {
             // Update the orders table using a new order
             // The order date is set to the current date using SYSDATE.
 
-            String sql = "INSERT INTO Orders_Total (student_id, order_date, total_price) " +
-                    "VALUES (" + student_id + ", SYSDATE, " + +total_price + ")";
+            String sql = "INSERT INTO Orders_Total (order_id, student_id, order_date, total_price) " +
+                    "VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ")";
 
             // String sql = "INSERT INTO Orders (order_id, student_id, order_date,
             // total_price, payment_method, card_no) VALUES ("+ order_id + ", " + student_id
