@@ -105,6 +105,31 @@ BEGIN
 END;
 /
 
+CREATE OR REPLACE TRIGGER update_student_discount
+AFTER INSERT ON Orders
+FOR EACH ROW
+DECLARE
+  v_total_price DECIMAL(10,2);
+BEGIN
+  SELECT SUM(total_price)
+  INTO v_total_price
+  FROM Orders
+  WHERE student_id = :NEW.student_id
+    AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
+
+  UPDATE Student
+  SET discount = (
+    CASE
+      WHEN v_total_price > 2000 THEN 0.20
+      WHEN v_total_price > 1000 THEN 0.10
+      ELSE 0
+    END
+  )
+  WHERE student_id = :NEW.student_id;
+END;
+/
+
+
 
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
