@@ -6,7 +6,7 @@ This is a **`Java-based university bookshop database application`** that support
 
 The application uses JDBC driver to access an Oracle database and is implemented with **PL/SQL** triggers to enforce various rules.
 
-To use this application, you need to execute the "BookShop.sql" script in your **`Oracle database`** to create the required tables and triggers, and initialize values for the "Book" and "Student" tables.
+To use this application, you need to execute the sql scripts in your **`Oracle database`** to create the required tables and triggers, and initialize values for the "Book" and "Student" tables.
 
 _Feel free to download and use this application as a reference for your own database projects._
 
