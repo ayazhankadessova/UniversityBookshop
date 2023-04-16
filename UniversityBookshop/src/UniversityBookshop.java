@@ -185,8 +185,8 @@ public class UniversityBookshop {
 	 * @return boolean
 	 */
 	public boolean loginDB() {
-		String username = "f1204276";// Replace to your username
-		String password = "f1204276";// Replace to your password
+		String username = "***REMOVED***";// Replace to your username
+		String password = "***REMOVED***";// Replace to your password
 
 		/* Do not change the code below */
 		if (username.equalsIgnoreCase("e1234567") || password.equalsIgnoreCase("e1234567")) {
