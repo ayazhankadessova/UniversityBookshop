@@ -612,89 +612,6 @@ public class UniversityBookshop {
         }
     }
 
-    /**
-     * // * Given order_id, get total price.
-     * //
-     */
-
-    // public double getTotalById(int order_id) {
-
-    // double result = 0;
-
-    // try {
-
-    // Statement stm = conn.createStatement();
-    // // Find the total price for each order_id
-    // String sql = "SELECT total_price FROM Orders_Total WHERE order_id = " +
-    // order_id;
-    // ResultSet rs = stm.executeQuery(sql);
-    // if (!rs.next())
-    // return 0;
-    // String[] heads = { " 🧳 total_price" };
-    // for (int i = 0; i < 1; ++i) {
-    // try {
-    // // Find all the prices and print them
-    // result = rs.getDouble(i + 1);
-    // System.out.println(heads[i] + " : " + result);
-    // // System.out.print(result);
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // } catch (SQLException e1) {
-    // e1.printStackTrace();
-    // // noException = false;
-    // }
-
-    // return result;
-
-    // }
-
-    /**
-     * Given student_id, update discount.
-     */
-
-    public void updateDiscount(int student_id) {
-
-        try {
-            Statement stm = conn.createStatement();
-
-            // Calculate discount if total price > 1000 or if total price > 2000
-            String sql = "UPDATE Student\n" +
-                    "SET discount = (\n" +
-                    "  CASE\n" +
-                    "    WHEN (\n" +
-                    "      SELECT SUM(total_price)\n" +
-                    "      FROM Orders\n" +
-                    "      WHERE student_id = " + student_id + "\n" +
-                    "      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
-                    "    ) > 2000 THEN 0.20\n" +
-                    "    WHEN (\n" +
-                    "      SELECT SUM(total_price)\n" +
-                    "      FROM Orders\n" +
-                    "      WHERE student_id = " + student_id + "\n" +
-                    "      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
-                    "    ) > 1000 THEN 0.10\n" +
-                    "    ELSE 0\n" +
-                    "  END\n" +
-                    ")\n" +
-                    "WHERE student_id = " + student_id;
-
-            // //System.out.println(sql);
-
-            stm.executeUpdate(sql);
-
-            stm.close();
-
-            System.out.println("succeed to update discount for student " + student_id);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Could not update discount for student " + student_id);
-            // noException = false;
-        }
-    }
-
     ////////////////////////// Helper Functions //////////////////////////
     /*
      * Ask to enter a student ID.
@@ -1117,11 +1034,14 @@ public class UniversityBookshop {
                     String card_no = payment_result[1];
 
                     try {
+                        // Insert to Orders
                         String insertResult = insertOrder(order_id, student_id, total_price, payment_method, card_no);
+                        // Insert to Orders_Total - helper table
                         String insertResult2 = insertOrder2(order_id, student_id, total_price);
 
                         if (insertResult.equals("success") && insertResult2.equals("success")) { // If payment is
-                                                                                                 // successful
+                                                                                                 // successful & totall
+                                                                                                 // added successfully
                             System.out.println("Payment successful!");
                             paymentSuccess = true;
                             for (BookOrder order : orders) {
@@ -1152,7 +1072,6 @@ public class UniversityBookshop {
                 System.out.println("Payment cancelled. Order not placed.");
             }
 
-            // updateDiscount(student_id);
         } else { // If the order size is zero or less
             System.out.println("No books were added to the order. Exiting the order placement process.");
         }
@@ -1226,7 +1145,7 @@ public class UniversityBookshop {
     }
 
     /*
-     * Insert Order
+     * Insert Orders_Total
      */
     public String insertOrder2(int order_id, int student_id, double total_price)
             throws SQLException {
@@ -1234,23 +1153,17 @@ public class UniversityBookshop {
         try {
             Statement stm = conn.createStatement();
 
-            // Update the orders table using a new order
+            // Update the orders_total table using a new order
             // The order date is set to the current date using SYSDATE.
 
             String sql = "INSERT INTO Orders_Total (order_id, student_id, order_date, total_price) " +
                     "VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ")";
 
-            // String sql = "INSERT INTO Orders (order_id, student_id, order_date,
-            // total_price, payment_method, card_no) VALUES ("+ order_id + ", " + student_id
-            // + ",'29-MAR-2023'," +total_price +", '" + payment_method +"' ," +
-            // card_no+")";
-            //// System.out.println(sql);
-
             stm.executeUpdate(sql);
 
             stm.close();
 
-            // System.out.println("succeed to insert Order " + order_id);
+            // System.out.println("succeed to insert Order_table " + order_id);
 
             // If order is added return success
             return "success";
