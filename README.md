@@ -10,6 +10,10 @@ To use this application, you need to execute the "BookShop.sql" script in your *
 
 _Feel free to download and use this application as a reference for your own database projects._
 
+<p align="center">
+  <img src="ER_diagram.png" width="350" title="hover text">
+</p>
+
 ## Setup
 
 Before running the program, make sure to execute the sql files on your Oracle database to create the necessary tables, triggers, and initial values for the Book and Student tables.
