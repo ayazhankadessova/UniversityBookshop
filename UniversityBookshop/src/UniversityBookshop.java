@@ -59,6 +59,11 @@ import com.jcraft.jsch.Session;
  * system, along with their details such as the order ID, student ID, and
  * delivery date.
  * 
+ * (8) 🎁 Check Discount for StudentID: This option allows the manager to check
+ * the discount for the student with the given student ID.
+ * 
+ * (9) Exit: This option allows the manager to exit the system.
+ * 
  * With these options, the University BookShop manager can effectively manage
  * the book inventory, process orders, and provide timely and efficient service
  * to its customers.
@@ -87,14 +92,14 @@ public class UniversityBookshop {
 	int jdbcPort;
 
 	String[] options = {
-			"🔍 Search Order by OrderID",
-			"🔍👩‍💻 Search Order by StudentID", // changed to student emoji
-			"🔍📚 Update Order for Student",
-			"🛍️ Place an Order",
-			"🗑️ Cancel an Order",
-			"📚 Show All Books",
-			"📋 Show All Orders",
-			"Check Discount for StudentID",
+			"- Search Order by OrderID",
+			"- Search Order by StudentID", // changed to student emoji
+			"- Update Order for Student",
+			"- Place an Order",
+			"- Cancel an Order",
+			"- Show All Books",
+			"- Show All Orders",
+			"- Check Discount for StudentID",
 			"Exit"
 	};
 
@@ -298,7 +303,7 @@ public class UniversityBookshop {
 				return;
 			}
 
-			String[] heads = { "order_id", "student_id", "order_date", "total_price", "💳 payment_method",
+			String[] heads = { "order_id", "student_id", "payment_method", "order_date", "total_price",
 					"card_no", "order_delivered" };
 
 			// if order exist, give order's information
@@ -612,87 +617,6 @@ public class UniversityBookshop {
 		}
 	}
 
-	/**
-	 * Given order_id, get total price.
-	 */
-
-	public double getTotalById(int order_id) {
-
-		double result = 0;
-
-		try {
-
-			Statement stm = conn.createStatement();
-			// Find the total price for each order_id
-			String sql = "SELECT total_price FROM Orders WHERE order_id = " + order_id;
-			ResultSet rs = stm.executeQuery(sql);
-			if (!rs.next())
-				return 0;
-			String[] heads = { " 🧳 total_price" };
-			for (int i = 0; i < 1; ++i) {
-				try {
-					// Find all the prices and print them
-					result = rs.getDouble(i + 1);
-					System.out.println(heads[i] + " : " + result);
-					// System.out.print(result);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			// noException = false;
-		}
-
-		return result;
-
-	}
-
-	/**
-	 * Given student_id, update discount.
-	 */
-
-	public void updateDiscount(int student_id) {
-
-		try {
-			Statement stm = conn.createStatement();
-
-			// Calculate discount if total price > 1000 or if total price > 2000
-			String sql = "UPDATE Student\n" +
-					"SET discount = (\n" +
-					"  CASE\n" +
-					"    WHEN (\n" +
-					"      SELECT SUM(total_price)\n" +
-					"      FROM Orders\n" +
-					"      WHERE student_id = " + student_id + "\n" +
-					"      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
-					"    ) > 2000 THEN 0.20\n" +
-					"    WHEN (\n" +
-					"      SELECT SUM(total_price)\n" +
-					"      FROM Orders\n" +
-					"      WHERE student_id = " + student_id + "\n" +
-					"      AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)\n" +
-					"    ) > 1000 THEN 0.10\n" +
-					"    ELSE 0\n" +
-					"  END\n" +
-					")\n" +
-					"WHERE student_id = " + student_id;
-
-			// //System.out.println(sql);
-
-			stm.executeUpdate(sql);
-
-			stm.close();
-
-			System.out.println("succeed to update discount for student " + student_id);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Could not update discount for student " + student_id);
-			// noException = false;
-		}
-	}
-
 	////////////////////////// Helper Functions //////////////////////////
 	/*
 	 * Ask to enter a student ID.
@@ -849,6 +773,39 @@ public class UniversityBookshop {
 			result.close();
 
 			return !exists;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/*
+	 * Check if all the books in the order are NOT delivered (for cancel order)
+	 * True - there are delivered orders
+	 * False - not orders are delivered
+	 */
+	public boolean orderDelivered(int order_id) {
+		try {
+			Statement stm = conn.createStatement();
+
+			// check if order_id exists and the delivery date has already passed for some
+			// books
+			String sql = "SELECT * FROM Orders WHERE order_id = " + order_id + " AND order_delivered = 'delivered'";
+
+			//// System.out.println(sql);
+
+			ResultSet result = stm.executeQuery(sql);
+
+			boolean exists = result.next();
+
+			if (exists) { // If some books have been delivered
+				System.out.println("The order is delivered...");
+			}
+
+			stm.close();
+			result.close();
+
+			return exists;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -1115,14 +1072,16 @@ public class UniversityBookshop {
 					String card_no = payment_result[1];
 
 					try {
+						// Insert to Orders
 						String insertResult = insertOrder(order_id, student_id, total_price, payment_method, card_no);
-						if (insertResult.equals("error")) { // Allow them to try again if there is an error in payment
-							System.out.println("Invalid. Do you want to try again? (Y/N)");
-							String response = in.nextLine();
-							if (!response.equalsIgnoreCase("Y")) { // If input is not 'Y', return
-								return;
-							}
-						} else { // If payment is successful
+						// Insert to Orders_Total - helper table
+						String insertResult2 = insertOrder2(order_id, student_id, total_price);
+
+						if (insertResult.equals("success") && insertResult2.equals("success")) { // If payment is
+																									// successful &
+																									// totall
+																									// added
+																									// successfully
 							System.out.println("Payment successful!");
 							paymentSuccess = true;
 							for (BookOrder order : orders) {
@@ -1131,6 +1090,15 @@ public class UniversityBookshop {
 								} catch (SQLException e) {
 									System.out.println("Error inserting book order details: " + e.getMessage());
 								}
+							}
+						} else if (insertResult.equals("error") || insertResult2.equals("error")) { // Allow them to try
+																									// again
+							// if there is an error in
+							// payment
+							System.out.println("Invalid. Do you want to try again? (Y/N)");
+							String response = in.nextLine();
+							if (!response.equalsIgnoreCase("Y")) { // If input is not 'Y', return
+								return;
 							}
 						}
 
@@ -1144,7 +1112,6 @@ public class UniversityBookshop {
 				System.out.println("Payment cancelled. Order not placed.");
 			}
 
-			// updateDiscount(student_id);
 		} else { // If the order size is zero or less
 			System.out.println("No books were added to the order. Exiting the order placement process.");
 		}
@@ -1195,24 +1162,16 @@ public class UniversityBookshop {
 		try {
 			Statement stm = conn.createStatement();
 
-			// Update the orders table using a new order
-			// The order date is set to the current date using SYSDATE.
 			String sql = "INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no) "
 					+
 					"VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ", '" + payment_method
 					+ "', '" + card_no + "')";
 
-			// String sql = "INSERT INTO Orders (order_id, student_id, order_date,
-			// total_price, payment_method, card_no) VALUES ("+ order_id + ", " + student_id
-			// + ",'29-MAR-2023'," +total_price +", '" + payment_method +"' ," +
-			// card_no+")";
-			//// System.out.println(sql);
-
 			stm.executeUpdate(sql);
 
 			stm.close();
 
-			System.out.println("succeed to insert Order " + order_id);
+			System.out.println("succeed to insert Order  " + order_id);
 
 			// If order is added return success
 			return "success";
@@ -1225,29 +1184,35 @@ public class UniversityBookshop {
 		}
 	}
 
-	public boolean deletefromOrdersBook(int order_id) throws SQLException {
+	/*
+	 * Insert Orders_Total
+	 */
+	public String insertOrder2(int order_id, int student_id, double total_price)
+			throws SQLException {
 
 		try {
 			Statement stm = conn.createStatement();
 
-			// Check for order to delete using order_id
-			String sql = "DELETE FROM Orders_Book WHERE order_id = " + order_id;
+			// Update the orders_total table using a new order
+			// The order date is set to the current date using SYSDATE.
 
-			//// System.out.println(sql);
+			String sql = "INSERT INTO Orders_Total (order_id, student_id, order_date, total_price) " +
+					"VALUES (" + order_id + ", " + student_id + ", SYSDATE, " + total_price + ")";
 
 			stm.executeUpdate(sql);
 
 			stm.close();
 
-			System.out.println("succeed to delete from Order_Book " + order_id);
-			return true;
+			// System.out.println("succeed to insert Order_table " + order_id);
+
+			// If order is added return success
+			return "success";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("fail to delete order Order_Book" + order_id);
-			return false;
+			// System.out.println("fail to insert order " + order_id);
 			// noException = false;
-			// return "error";
+			return "error";
 		}
 	}
 
@@ -1255,21 +1220,7 @@ public class UniversityBookshop {
 
 		try {
 			Statement stm = conn.createStatement();
-			// if (deletefromOrdersBook(order_id)) {
-			// // Check for order to delete using order_id
-			// String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
 
-			// //// System.out.println(sql);
-
-			// stm.executeUpdate(sql);
-
-			// stm.close();
-
-			// System.out.println("succeed to delete Order " + order_id);
-			// return "success";
-
-			// }
-			// Check for order to delete using order_id
 			String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
 
 			//// System.out.println(sql);
@@ -1280,18 +1231,6 @@ public class UniversityBookshop {
 
 			System.out.println("succeed to delete Order " + order_id);
 			return "success";
-
-			// // Check for order to delete using order_id
-			// String sql = "DELETE FROM Orders WHERE order_id = " + order_id;
-
-			// //// System.out.println(sql);
-
-			// stm.executeUpdate(sql);
-
-			// stm.close();
-
-			// System.out.println("succeed to delete Order " + order_id);
-			// return "success";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1322,6 +1261,11 @@ public class UniversityBookshop {
 		// Find the order information using order_id
 		orderSearchbyID(order_id);
 
+		// if order_delivered
+		if (orderDelivered(order_id)) {
+			return;
+		}
+
 		if (!allNOTDelivered(order_id)) { // If any of the books have been delivered, return
 			System.out.println("Some or All books in this order have been delivered. You cannot cancel this order.");
 			return;
@@ -1347,8 +1291,6 @@ public class UniversityBookshop {
 				return;
 			} else { // If there are no errors, cancel order
 				System.out.println("Order cancelled successfully!");
-				updateDiscount(student_id);
-
 			}
 		} else { // If user does not press 'Y'
 			System.out.println("You have chosen not to cancel the order.");
@@ -1521,7 +1463,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "💸💸💸discount" };
+			String[] heads = { "discount" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getDouble(i + 1);
@@ -1555,7 +1497,7 @@ public class UniversityBookshop {
 			ResultSet rs = stm.executeQuery(sql);
 			if (!rs.next())
 				return 0;
-			String[] heads = { "📖 book_price" };
+			String[] heads = { "- book_price" };
 			for (int i = 0; i < 1; ++i) {
 				try {
 					result = rs.getDouble(i + 1);
