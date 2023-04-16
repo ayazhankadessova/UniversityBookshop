@@ -1,5 +1,12 @@
 # COMP2016-University BookShop Manager
 
+## Group Members:
+
+- KADESSOVA Ayazhan 
+- ONG Jun Kye
+- SHAMMO Shahtiya Khan
+- LIM Jihye
+
 ## About
 
 This is a **`Java-based university bookshop database application`** that supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
