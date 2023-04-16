@@ -16,7 +16,7 @@ _Feel free to download and use this application as a reference for your own data
 
 ## Setup
 
-Before running the program, make sure to execute the sql files in your **`Oracle database`** to drop tables & create the necessary tables, triggers, and initial values for the Book and Student tables.
+1. Before running the program, make sure to execute the sql files in your **`Oracle database`** to drop tables & create the necessary tables, triggers, and initial values for the Book and Student tables.
 
 - Terminal:
 
@@ -24,17 +24,15 @@ Before running the program, make sure to execute the sql files in your **`Oracle
 
 `@ ./group3_dbinsert.sql`
 
-## Usage
-
-UniversityBookshop.java:
-
-- Change your login and password for Oracle Database.
+2. Change your login and password for Oracle Database in UniversityBookshop.java:
 
 ```
 public boolean loginDB() {
 		String username = "yourUSERNAME";// Replace to your username
 		String password = "yourPASSWORD";// Replace to your password
 ```
+
+## Usage
 
 To run the program, simply compile and run UniversityBookshop.java. You will be prompted to select an option from the menu to perform the desired operation. Follow the on-screen instructions to complete each operation.
 
