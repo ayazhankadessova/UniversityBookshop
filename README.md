@@ -1,4 +1,4 @@
-# COMP2016-University BookShop Manager
+# University BookShop Manager
 
 ## Group Members:
 
@@ -9,7 +9,9 @@
 
 ## About
 
-This is a **`Java-based university bookshop database application`** that supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
+This is a **`Java-based university bookshop database application`** developed for **COMP2016 Database Management** course.
+
+It supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
 
 The application uses JDBC driver to access an Oracle database and is implemented with **PL/SQL** triggers to enforce various rules.
 
