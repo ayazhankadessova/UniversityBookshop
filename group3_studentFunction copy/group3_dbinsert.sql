@@ -138,34 +138,45 @@ END;
 
 
 CREATE OR REPLACE TRIGGER update_student_discount
-AFTER INSERT ON Orders
+AFTER INSERT OR UPDATE ON Orders
 FOR EACH ROW
 DECLARE
-  v_student_id Orders.student_id%TYPE;
   v_total_price DECIMAL(10,2);
+  v_total_new DECIMAL(10,2):= 0;
+
 BEGIN
-
-
-  v_student_id := :NEW.student_id;
   
-  SELECT SUM(total_price) + :NEW.total_price
+  DBMS_OUTPUT.PUT_LINE('v_total_new=' || v_total_new);
+
+  SELECT SUM(total_price)
   INTO v_total_price
   FROM Orders_Total
-  WHERE student_id = v_student_id
+  WHERE student_id = :NEW.student_id
     AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
 
-  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_price);
+IF v_total_price > 0 THEN
+    v_total_new := v_total_price + :NEW.total_price;
+  ELSE
+    v_total_new := :NEW.total_price;
+  END IF;
+
+  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_new);
+  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || :NEW.total_price);
 
   
-  UPDATE Student
-  SET discount = (
-    CASE
-      WHEN v_total_price > 2000 THEN 0.20
-      WHEN v_total_price > 1000 THEN 0.10
-      ELSE 0
-    END
-  )
-  WHERE student_id = v_student_id;
+  IF v_total_new > 2000 THEN
+    UPDATE Student
+    SET discount = 0.20
+    WHERE student_id = :NEW.student_id;
+  ELSIF v_total_new > 1000 THEN
+    UPDATE Student
+    SET discount = 0.10
+    WHERE student_id = :NEW.student_id;
+  ELSE
+    UPDATE Student
+    SET discount = 0
+    WHERE student_id = :NEW.student_id;
+  END IF;
 END;
 /
 
@@ -204,6 +215,53 @@ BEGIN
   WHERE book_id = :OLD.book_id;
 END;
 /
+
+CREATE OR REPLACE TRIGGER update_student_discount_del
+AFTER DELETE ON Orders
+FOR EACH ROW
+DECLARE
+  v_total_price DECIMAL(10,2);
+  v_total_new DECIMAL(10,2):= 0;
+
+BEGIN
+  
+  DBMS_OUTPUT.PUT_LINE('v_total_new=' || v_total_new);
+
+  SELECT SUM(total_price)
+  INTO v_total_price
+  FROM Orders_Total
+  WHERE student_id = :OLD.student_id
+    AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
+
+  IF v_total_price > 0 THEN
+    v_total_new := v_total_price - :OLD.total_price;
+  ELSE
+    v_total_new := 0;
+  END IF;
+
+  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_new);
+  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || :OLD.total_price);
+
+  
+  IF v_total_new > 2000 THEN
+    UPDATE Student
+    SET discount = 0.20
+    WHERE student_id = :OLD.student_id;
+  ELSIF v_total_new > 1000 THEN
+    UPDATE Student
+    SET discount = 0.10
+    WHERE student_id = :OLD.student_id;
+  ELSE
+    UPDATE Student
+    SET discount = 0
+    WHERE student_id = :OLD.student_id;
+  END IF;
+
+  DELETE FROM Orders_Total WHERE order_id = :OLD.order_id;
+
+END;
+/
+
 
 COMMIT;
 
