@@ -27,6 +27,15 @@ CREATE TABLE Orders (
     FOREIGN KEY (student_id) REFERENCES Student(student_id)
 );
 
+CREATE TABLE Orders_Total (
+    order_id INT,
+    student_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id)
+);
+
 
 CREATE TABLE Orders_Book (
     order_id INT,
@@ -42,6 +51,14 @@ COMMIT;
 ALTER TABLE Orders_Book
 ADD CONSTRAINT FK_ORDERS_BOOK_ORDER_ID
 FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY DEFERRED DEFERRABLE;
+
+
+COMMIT;
+
+-- dont add on delete cascade because we delete in the trigger update_student_discount_del
+ALTER TABLE Orders_Total 
+ADD CONSTRAINT FK_ORDERS_Total_ORDER_ID
+FOREIGN KEY (order_id) REFERENCES Orders(order_id) INITIALLY DEFERRED DEFERRABLE;
 
 COMMIT;
 
@@ -71,23 +88,6 @@ INSERT INTO Student VALUES (8, 'Avery Taylor', 'Female', 'Psychology', 0.00);
 INSERT INTO Student VALUES (9, 'Kevin Patel', 'Male', 'Economics', 0.00);
 INSERT INTO Student VALUES (10, 'Sophia Kim', 'Female', 'Sociology', 0.00);
 
--- Insert into Orders table
--- PROMPT INSERT Orders TABLE;
--- INSERT INTO Orders VALUES (1, 1, '29-MAR-2023', 40.00, 'Credit Card', '1234567890123456');
--- INSERT INTO Orders VALUES (2, 3, '30-MAR-2023', 30.00, 'Debit Card', '6543210987654321');
--- INSERT INTO Orders VALUES (3, 2, '30-MAR-2023', 50.00, 'Credit Card', '9876543210123456');
--- INSERT INTO Orders VALUES (4, 4, '31-MAR-2023', 20.00, 'PayPal', NULL);
-
--- Insert into Orders_Book table
--- DD-MON-YYYY' (e.g., 23-MAR-2022), 
--- PROMPT INSERT Orders_Book TABLE;
--- INSERT INTO Orders_Book VALUES (1, 1, 2, '02-MAR-2023');
--- INSERT INTO Orders_Book VALUES (1, 3, 1, '02-MAR-2023');
--- INSERT INTO Orders_Book VALUES (2, 2, 3, '01-MAR-2023');
--- INSERT INTO Orders_Book VALUES (3, 4, 2, '03-MAR-2023');
--- INSERT INTO Orders_Book VALUES (4, 1, 1, '01-MAR-2023');
--- INSERT INTO Orders_Book VALUES (4, 2, 1, '01-MAR-2023');
-
 COMMIT;
 
 
@@ -105,32 +105,6 @@ BEGIN
 END;
 /
 
--- CREATE OR REPLACE TRIGGER update_student_discount
--- AFTER INSERT ON Orders
--- FOR EACH ROW
--- DECLARE
---   v_total_price DECIMAL(10,2);
--- BEGIN
---   SELECT SUM(total_price)
---   INTO v_total_price
---   FROM Orders
---   WHERE student_id = :NEW.student_id
---     AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
-
---   UPDATE Student
---   SET discount = (
---     CASE
---       WHEN v_total_price > 2000 THEN 0.20
---       WHEN v_total_price > 1000 THEN 0.10
---       ELSE 0
---     END
---   )
---   WHERE student_id = :NEW.student_id;
--- END;
--- /
-
-
-
 -- Create a trigger to check if there is enough amount of the book in the Book table Before we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER check_book_amount
 BEFORE INSERT ON Orders_Book
@@ -147,65 +121,69 @@ BEGIN
 END;
 /
 
+-- update student discount after new order
+CREATE OR REPLACE TRIGGER update_student_discount
+AFTER INSERT OR UPDATE ON Orders
+FOR EACH ROW
+DECLARE
+  v_total_price DECIMAL(10,2);
+  v_total_new DECIMAL(10,2):= 0;
+
+BEGIN
+  -- initial new
+  DBMS_OUTPUT.PUT_LINE('v_total_new=' || v_total_new);
+
+  SELECT SUM(total_price)
+  INTO v_total_price
+  FROM Orders_Total
+  WHERE student_id = :NEW.student_id
+    AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
+
+-- check if v_total_price is empty or not.
+-- if we try to add empty -> v_total_new becaomes empty and the trigger does not work
+-- if v_total_price not empty, we can add
+IF v_total_price > 0 THEN
+    v_total_new := v_total_price + :NEW.total_price;
+  ELSE
+    v_total_new := :NEW.total_price;
+  END IF;
+
+-- check in terminal
+  DBMS_OUTPUT.PUT_LINE('initial new ' || :NEW.total_price);
+  DBMS_OUTPUT.PUT_LINE(' after, v_total_new= ' || v_total_new);
+
+  -- set discount
+  IF v_total_new > 2000 THEN
+    UPDATE Student
+    SET discount = 0.20
+    WHERE student_id = :NEW.student_id;
+  ELSIF v_total_new > 1000 THEN
+    UPDATE Student
+    SET discount = 0.10
+    WHERE student_id = :NEW.student_id;
+  ELSE
+    UPDATE Student
+    SET discount = 0
+    WHERE student_id = :NEW.student_id;
+  END IF;
+END;
+/
+
 -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
--- CREATE OR REPLACE TRIGGER update_total_price_and_amount
--- AFTER INSERT ON Orders_Book
--- FOR EACH ROW
--- DECLARE
---   v_book_amount NUMBER;
--- BEGIN
---   v_book_amount := :NEW.book_amount;
-
---   -- Update book amount
---   UPDATE Book
---   SET amount = amount - v_book_amount
---   WHERE book_id = :NEW.book_id;
--- END;
--- /
-
-CREATE OR REPLACE TRIGGER update_total_price_and_amount
+CREATE OR REPLACE TRIGGER update_amount
 AFTER INSERT ON Orders_Book
 FOR EACH ROW
 DECLARE
-  v_student_id Orders.student_id%TYPE;
-  v_book_amount Orders_Book.book_amount%TYPE;
-  v_total_price DECIMAL(10,2);
+  v_book_amount NUMBER;
 BEGIN
   v_book_amount := :NEW.book_amount;
-  SELECT student_id INTO v_student_id FROM Orders WHERE order_id = :NEW.order_id;
 
   -- Update book amount
   UPDATE Book
   SET amount = amount - v_book_amount
   WHERE book_id = :NEW.book_id;
-
-  -- Update student discount
-  SELECT SUM(total_price)
-  INTO v_total_price
-  FROM Orders
-  WHERE student_id = v_student_id
-    AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE);
-
-  UPDATE Student
-  SET discount = (
-    CASE
-      WHEN v_total_price > 2000 THEN 0.20
-      WHEN v_total_price > 1000 THEN 0.10
-      ELSE 0
-    END
-  )
-  WHERE student_id = v_student_id;
-  
-  END;
+END;
 /
-
--- CREATE OR REPLACE TRIGGER delete_orders_book
--- BEFORE DELETE ON Orders
--- FOR EACH ROW
--- BEGIN
---   DELETE FROM Orders_Book WHERE order_id = :OLD.order_id;
--- END;
--- /
 
 -- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
 CREATE OR REPLACE TRIGGER add_book_amount
@@ -223,36 +201,59 @@ BEGIN
 END;
 /
 
--- -- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
--- CREATE OR REPLACE TRIGGER add_discount
--- AFTER DELETE ON Orders_Book
--- FOR EACH ROW
--- DECLARE
---   v_student_id Orders.student_id%TYPE;
---   v_total_price DECIMAL(10,2);
--- BEGIN
---   SELECT student_id INTO v_student_id FROM Orders WHERE order_id = :NEW.order_id;
+-- update student discount after an order has been deleted
+CREATE OR REPLACE TRIGGER update_student_discount_del
+AFTER DELETE ON Orders
+FOR EACH ROW
+DECLARE
+  v_total_price DECIMAL(10,2);
+  v_total_new DECIMAL(10,2):= 0;
 
--- -- Update student discount
---   SELECT SUM(total_price)
---   INTO v_total_price
---   FROM Orders
---   WHERE student_id = v_student_id
---     AND EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM SYSDATE)
---     AND order_id != :OLD.order_id;
+BEGIN
+  
+  DBMS_OUTPUT.PUT_LINE('v_total_new=' || v_total_new);
 
+  SELECT SUM(total_price)
+  INTO v_total_price
+  FROM Orders_Total
+  WHERE student_id = :OLD.student_id
+    AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
 
---   UPDATE Student
---   SET discount = (
---     CASE
---       WHEN v_total_price > 2000 THEN 0.20
---       WHEN v_total_price > 1000 THEN 0.10
---       ELSE 0
---     END
---   )
---   WHERE student_id = v_student_id;
--- END;
--- /
+-- check if v_total_price is empty or not.
+-- if we try to use empty -> v_total_new becomes empty and the trigger does not work
+-- if v_total_price not empty, we can use it
+  IF v_total_price > 0 THEN
+  -- subtract deleted order price
+    v_total_new := v_total_price - :OLD.total_price;
+  ELSE
+  -- if no matches, just 0
+    v_total_new := 0;
+  END IF;
+
+-- check in terminal
+  DBMS_OUTPUT.PUT_LINE('initial total that we are deleting: ' || :OLD.total_price);
+  DBMS_OUTPUT.PUT_LINE(' after, v_total_new= ' || v_total_new);
+
+  -- set discount
+  IF v_total_new > 2000 THEN
+    UPDATE Student
+    SET discount = 0.20
+    WHERE student_id = :OLD.student_id;
+  ELSIF v_total_new > 1000 THEN
+    UPDATE Student
+    SET discount = 0.10
+    WHERE student_id = :OLD.student_id;
+  ELSE
+    UPDATE Student
+    SET discount = 0
+    WHERE student_id = :OLD.student_id;
+  END IF;
+
+-- delete from Orders_Total
+  DELETE FROM Orders_Total WHERE order_id = :OLD.order_id;
+
+END;
+/
 
 
 COMMIT;
