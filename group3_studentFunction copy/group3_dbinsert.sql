@@ -55,6 +55,7 @@ FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE INITIALLY D
 
 COMMIT;
 
+-- dont add on delete cascade because we delete in the trigger update_student_discount_del
 ALTER TABLE Orders_Total 
 ADD CONSTRAINT FK_ORDERS_Total_ORDER_ID
 FOREIGN KEY (order_id) REFERENCES Orders(order_id) INITIALLY DEFERRED DEFERRABLE;
@@ -136,7 +137,7 @@ BEGIN
 END;
 /
 
-
+-- update student discount after new order
 CREATE OR REPLACE TRIGGER update_student_discount
 AFTER INSERT OR UPDATE ON Orders
 FOR EACH ROW
@@ -145,7 +146,7 @@ DECLARE
   v_total_new DECIMAL(10,2):= 0;
 
 BEGIN
-  
+  -- initial new
   DBMS_OUTPUT.PUT_LINE('v_total_new=' || v_total_new);
 
   SELECT SUM(total_price)
@@ -154,16 +155,20 @@ BEGIN
   WHERE student_id = :NEW.student_id
     AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
 
+-- check if v_total_price is empty or not.
+-- if we try to add empty -> v_total_new becaomes empty and the trigger does not work
+-- if v_total_price not empty, we can add
 IF v_total_price > 0 THEN
     v_total_new := v_total_price + :NEW.total_price;
   ELSE
     v_total_new := :NEW.total_price;
   END IF;
 
-  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_new);
-  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || :NEW.total_price);
+-- check in terminal
+  DBMS_OUTPUT.PUT_LINE('initial new ' || :NEW.total_price);
+  DBMS_OUTPUT.PUT_LINE(' after, v_total_new= ' || v_total_new);
 
-  
+  -- set discount
   IF v_total_new > 2000 THEN
     UPDATE Student
     SET discount = 0.20
@@ -179,8 +184,6 @@ IF v_total_price > 0 THEN
   END IF;
 END;
 /
-
-
 
 -- Create a trigger to update the amount of books in the Book table after we Insert it to Orders_Book table
 CREATE OR REPLACE TRIGGER update_amount
@@ -198,8 +201,6 @@ BEGIN
 END;
 /
 
-
-
 -- Create a trigger to update the total price of the order after we delete it from orders_book {when we cancel order}
 CREATE OR REPLACE TRIGGER add_book_amount
 AFTER DELETE ON Orders_Book
@@ -216,6 +217,7 @@ BEGIN
 END;
 /
 
+-- update student discount after an order has been deleted
 CREATE OR REPLACE TRIGGER update_student_discount_del
 AFTER DELETE ON Orders
 FOR EACH ROW
@@ -233,16 +235,22 @@ BEGIN
   WHERE student_id = :OLD.student_id
     AND order_date >= ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), -12);
 
+-- check if v_total_price is empty or not.
+-- if we try to use empty -> v_total_new becomes empty and the trigger does not work
+-- if v_total_price not empty, we can use it
   IF v_total_price > 0 THEN
+  -- subtract deleted order price
     v_total_new := v_total_price - :OLD.total_price;
   ELSE
+  -- if no matches, just 0
     v_total_new := 0;
   END IF;
 
-  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || v_total_new);
-  DBMS_OUTPUT.PUT_LINE('Trigger executed for order id ' || :OLD.total_price);
+-- check in terminal
+  DBMS_OUTPUT.PUT_LINE('initial total that we are deleting: ' || :OLD.total_price);
+  DBMS_OUTPUT.PUT_LINE(' after, v_total_new= ' || v_total_new);
 
-  
+  -- set discount
   IF v_total_new > 2000 THEN
     UPDATE Student
     SET discount = 0.20
@@ -257,6 +265,7 @@ BEGIN
     WHERE student_id = :OLD.student_id;
   END IF;
 
+-- delete from Orders_Total
   DELETE FROM Orders_Total WHERE order_id = :OLD.order_id;
 
 END;
