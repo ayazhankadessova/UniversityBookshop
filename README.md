@@ -12,8 +12,8 @@ _Feel free to download and use this application as a reference for your own data
 
 ## ER Diagram
 
-<p>
-  <img src="ER_diagram.png" width="450" title="hover text">
+<p align="center">
+  <img src="ER_diagram.png" width="550" title="hover text">
 </p>
 
 ## Setup
