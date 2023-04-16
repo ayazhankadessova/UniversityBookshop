@@ -298,12 +298,12 @@ public class UniversityBookshop {
                 return;
             }
 
-            String[] heads = { "order_id", "student_id", "💳 payment_method",
+            String[] heads = { "order_id", "student_id", "payment_method", "order_date", "total_price",
                     "card_no", "order_delivered" };
 
             // if order exist, give order's information
             while (exists) {
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 7; i++) {
                     String result = "";
                     switch (heads[i]) {
                         // order_id and student_id format is integer
