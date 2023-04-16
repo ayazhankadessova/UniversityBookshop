@@ -16,7 +16,7 @@ _Feel free to download and use this application as a reference for your own data
 
 ## Setup
 
-Before running the program, make sure to execute the sql files on your Oracle database to create the necessary tables, triggers, and initial values for the Book and Student tables.
+Before running the program, make sure to execute the sql files in your **`Oracle database`** to drop tables & create the necessary tables, triggers, and initial values for the Book and Student tables.
 
 - Terminal:
 
