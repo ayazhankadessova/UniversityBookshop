@@ -4,7 +4,7 @@
 
 This is a **`Java-based university bookshop database application`** that supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
 
-The application uses JDBC driver to access an Oracle database and is implemented with **PL/SQL** triggers to enforce various business rules.
+The application uses JDBC driver to access an Oracle database and is implemented with **PL/SQL** triggers to enforce various rules.
 
 To use this application, you need to execute the "BookShop.sql" script in your **`Oracle database`** to create the required tables and triggers, and initialize values for the "Book" and "Student" tables.
 
