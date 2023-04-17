@@ -11,7 +11,7 @@
 
 ## About
 
-This is a **`Java-based university bookshop database application`** developed for **COMP2016 Database Management** course.
+This is a **Java-based University Bookshop Database Application** developed for **`COMP2016 Database Management`** course.
 
 It supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
 
@@ -41,6 +41,8 @@ _Feel free to download and use this application as a reference for your own data
 public boolean loginDB() {
 		String username = "yourUSERNAME";// Replace to your username
 		String password = "yourPASSWORD";// Replace to your password
+		...
+		}
 ```
 
 ## Usage
