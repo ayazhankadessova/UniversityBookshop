@@ -78,14 +78,14 @@ To run the program, simply compile and run UniversityBookshop.java. You will be 
 
 With these options, the University BookShop manager can effectively manage the book inventory, process orders, and provide timely and efficient service to its customers.
 
-### Group Members:
+## Group Members:
 
 - KADESSOVA Ayazhan 
 - ONG Jun Kye
 - SHAMMO Shahtiya Khan
 - LIM Jihye
 
-### Skills improved:
+## Skills improved:
 
 - Conceptual & Logical database design
 - Oracle Database Management
