@@ -93,4 +93,4 @@ With these options, the University BookShop manager can effectively manage the b
 4. decide on delivery date - resolved
 5. after placing order, options printec twice [resolved, issue: declared local scanner]
 
-!! important : use bfg repo-cleaner for removing password
+!! important : use bfg repo-cleaner for removing password [done]
