@@ -2,7 +2,7 @@
  <img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="60"> University BookShop Manager <img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="60">
 </h2>
 
-`Conceptual & Logical database design`, `Oracle Database Management`, `PL/SQL trigger implementation`, `JDBC implementation`, `Testing`,`Teamwork`.
+`Conceptual & Logical database design`, `Oracle Database Management`, `SQL(Create/query/update relational tables)`, `PL/SQL trigger implementation`, `JDBC implementation`, `Testing`,`Teamwork`.
 
 ## Group Members:
 
