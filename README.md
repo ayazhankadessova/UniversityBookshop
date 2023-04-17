@@ -1,5 +1,10 @@
 # University BookShop Manager
 
+
+<h2 align="center">
+ <img src="https://media.giphy.com/media/QYd2ZfyFw3BxfGgJ5E/giphy.gif" width="70">LEarnBU: Web-based Financial Literacy Game<img src="https://media.giphy.com/media/QYd2ZfyFw3BxfGgJ5E/giphy.gif" width="70">
+</h2>
+
 ## Group Members:
 
 - KADESSOVA Ayazhan 
