@@ -2,7 +2,7 @@
 
 
 <h2 align="center">
- <img src="https://media.giphy.com/media/QYd2ZfyFw3BxfGgJ5E/giphy.gif" width="70">LEarnBU: Web-based Financial Literacy Game<img src="https://media.giphy.com/media/QYd2ZfyFw3BxfGgJ5E/giphy.gif" width="70">
+ <img src="https://media.giphy.com/media/58lsLv6YlFtOOM3iob/giphy.gif" width="70">LEarnBU: Web-based Financial Literacy Game<img src="https://media.giphy.com/media/58lsLv6YlFtOOM3iob/giphy.gif" width="70">
 </h2>
 
 ## Group Members:
