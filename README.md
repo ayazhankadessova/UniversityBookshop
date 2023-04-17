@@ -2,22 +2,6 @@
  <img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="60"> University BookShop Manager <img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="60">
 </h2>
 
-### Group Members:
-
-- KADESSOVA Ayazhan 
-- ONG Jun Kye
-- SHAMMO Shahtiya Khan
-- LIM Jihye
-
-## Skills:
-
-- Conceptual & Logical database design
-- Oracle Database Management
-- PL/SQL trigger implementation
-- JDBC implementation
-- Testing 
-- Team Work
-
 ## About
 
 This is a **Java-based University Bookshop Database Application** developed for **`COMP2016 Database Management`** course.
@@ -93,6 +77,22 @@ To run the program, simply compile and run UniversityBookshop.java. You will be 
 9. Exit: This option allows the manager to exit the system.
 
 With these options, the University BookShop manager can effectively manage the book inventory, process orders, and provide timely and efficient service to its customers.
+
+### Group Members:
+
+- KADESSOVA Ayazhan 
+- ONG Jun Kye
+- SHAMMO Shahtiya Khan
+- LIM Jihye
+
+### Skills improved:
+
+- Conceptual & Logical database design
+- Oracle Database Management
+- PL/SQL trigger implementation
+- JDBC implementation
+- Testing 
+- Team Work
 
 ## Issues/need to check
 
