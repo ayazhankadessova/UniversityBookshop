@@ -9,6 +9,15 @@
 - SHAMMO Shahtiya Khan
 - LIM Jihye
 
+## Skills:
+
+- Conceptual & Logical database design
+- Oracle Database Management
+- PL/SQL trigger implementation
+- JDBC implementation
+- Testing 
+- Team Work
+
 ## About
 
 This is a **Java-based University Bookshop Database Application** developed for **`COMP2016 Database Management`** course.
