@@ -1,5 +1,5 @@
 <h2 align="center">
- <img src="https://media.giphy.com/media/3hoLIVAJYkz6T0Ichp/giphy.gif" width="70">University BookShop Manager<img src="https://media.giphy.com/media/3hoLIVAJYkz6T0Ichp/giphy.gif" width="70">
+ <img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="70">University BookShop Manager<img src="https://media.giphy.com/media/Sh7FMlRTsgB8lO8WKJ/giphy.gif" width="70">
 </h2>
 
 ## Group Members:
