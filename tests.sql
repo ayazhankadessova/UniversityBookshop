@@ -64,50 +64,104 @@ COMMIT;
 
 PROMPT INSERT Book TABLE;
 
-INSERT INTO Book VALUES (1, 'To Kill a Mockingbird', 'Harper Lee', 180.99, 50);
-INSERT INTO Book VALUES (2, '1984', 'George Orwell', 200.05, 30);
-INSERT INTO Book VALUES (3, 'Pride and Prejudice', 'Jane Austen', 220.05, 40);
-INSERT INTO Book VALUES (4, 'The Great Gatsby', 'F. Scott Fitzgerald', 290.05, 20);
-INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel García Márquez', 300.05, 60);
-INSERT INTO Book VALUES (6, 'The Catcher in the Rye', 'J.D. Salinger', 240.99, 35);
-INSERT INTO Book VALUES (7, 'The Lord of the Rings', 'J.R.R. Tolkien', 350.99, 25);
-INSERT INTO Book VALUES (8, 'Brave New World', 'Aldous Huxley', 180.99, 30);
-INSERT INTO Book VALUES (9, 'Animal Farm', 'George Orwell', 150.05, 50);
-INSERT INTO Book VALUES (10, 'The Hobbit', 'J.R.R. Tolkien', 170.05, 45);
+-- INSERT INTO Book VALUES (1, 'To Kill a Mockingbird', 'Harper Lee', 180.99, 50);
+-- INSERT INTO Book VALUES (2, '1984', 'George Orwell', 200.05, 30);
+-- INSERT INTO Book VALUES (3, 'Pride and Prejudice', 'Jane Austen', 220.05, 40);
+-- INSERT INTO Book VALUES (4, 'The Great Gatsby', 'F. Scott Fitzgerald', 290.05, 20);
+-- INSERT INTO Book VALUES (5, 'One Hundred Years of Solitude', 'Gabriel García Márquez', 300.05, 60);
+-- INSERT INTO Book VALUES (6, 'The Catcher in the Rye', 'J.D. Salinger', 240.99, 35);
+-- INSERT INTO Book VALUES (7, 'The Lord of the Rings', 'J.R.R. Tolkien', 350.99, 25);
+-- INSERT INTO Book VALUES (8, 'Brave New World', 'Aldous Huxley', 180.99, 30);
+-- INSERT INTO Book VALUES (9, 'Animal Farm', 'George Orwell', 150.05, 50);
+-- INSERT INTO Book VALUES (10, 'The Hobbit', 'J.R.R. Tolkien', 170.05, 45);
+INSERT INTO Book VALUES (1, 'Harry Potter I', 'J.R.R. Tolkien', 300.00, 10);
+INSERT INTO Book VALUES (2, 'Harry Potter II', 'J.R.R. Tolkien', 300.00, 0);
+INSERT INTO Book VALUES (3, 'Harry Potter III', 'J.R.R. Tolkien', 400.00, 20);
+
+
+
 
 -- Insert into Student table
-PROMPT INSERT Student TABLE;
-INSERT INTO Student VALUES (1, 'John Smith', 'Male', 'English', 0.00);
-INSERT INTO Student VALUES (2, 'Sarah Johnson', 'Female', 'Biology', 0.00);
-INSERT INTO Student VALUES (3, 'David Chen', 'Male', 'Computer Science', 0.00);
-INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.00);
-INSERT INTO Student VALUES (5, 'Michael Kim', 'Male', 'Mathematics', 0.00);
-INSERT INTO Student VALUES (6, 'Jessica Lee', 'Female', 'Chemistry', 0.00);
-INSERT INTO Student VALUES (7, 'Daniel Rodriguez', 'Male', 'Physics', 0.00);
-INSERT INTO Student VALUES (8, 'Avery Taylor', 'Female', 'Psychology', 0.00);
-INSERT INTO Student VALUES (9, 'Kevin Patel', 'Male', 'Economics', 0.00);
-INSERT INTO Student VALUES (10, 'Sophia Kim', 'Female', 'Sociology', 0.00);
 
+
+In the student table:
+COMP2016 Project ---- Sample Test Scenario
+Kurt can enjoy 10% discount, and his current total order amount is $1900. Rex has current total order amount $900.
+Jerry has current total order amount $300.
+In the book table:
+“Harry Potter I” has 10 books in stock, $300 each. “Harry Potter II” has 0 book in stock, $300 each. “Harry Potter III” has 20 books in stock, $400 each.
+Order information:
+Rex has made an order for “Harry Potter I” and “Harry Potter II” three days ago, and the total amount is $600. “Harry Potter I” has been delivered.
+Kurt has ordered a “Harry Potter II”, eight days ago, and the total amount is $300.
+
+
+
+PROMPT INSERT Student TABLE;
+INSERT INTO Student VALUES (1, 'Kurt', 'Male', 'English', 0.1);
+INSERT INTO Student VALUES (2, 'Rex', 'Female', 'Biology', 0.00);
+INSERT INTO Student VALUES (3, 'Jerry', 'Male', 'Computer Science', 0.00);
+-- INSERT INTO Student VALUES (4, 'Emily Wong', 'Female', 'History', 0.00);
+-- INSERT INTO Student VALUES (5, 'Michael Kim', 'Male', 'Mathematics', 0.00);
+-- INSERT INTO Student VALUES (6, 'Jessica Lee', 'Female', 'Chemistry', 0.00);
+-- INSERT INTO Student VALUES (7, 'Daniel Rodriguez', 'Male', 'Physics', 0.00);
+-- INSERT INTO Student VALUES (8, 'Avery Taylor', 'Female', 'Psychology', 0.00);
+-- INSERT INTO Student VALUES (9, 'Kevin Patel', 'Male', 'Economics', 0.00);
+-- INSERT INTO Student VALUES (10, 'Sophia Kim', 'Female', 'Sociology', 0.00);
+
+COMMIT;
+
+PROMPT INSERT Orders TABLE;
 
 -- test for more than 7 days ago
 INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
-VALUES (1287, 5, '08-APR-2023', 500.00, 'Apple Pay', NULL);
+VALUES (1287, 2, '18-APR-2023', 600.00, 'Apple Pay', NULL);
 
--- test for some books delievered
-INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no, order_delivered)
-VALUES (1288, 6, '17-APR-2023', 500.00, 'Apple Pay', NULL, 'pending');
+-- test for more than 7 days ago
+INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+VALUES (1286, 1, '13-APR-2023', 300.00, 'Apple Pay', NULL);
 
-INSERT INTO Orders_Book VALUES (1288, 1, 2, '20-APR-2023');
-INSERT INTO Orders_Book VALUES (1288, 3, 2, '27-APR-2023');
+-- test for more than 7 days ago
+INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+VALUES (1920, 3, '05-APR-2023', 300.00, 'Apple Pay', NULL);
 
--- test order delivered
-INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no, order_delivered)
-VALUES (1289, 7, '16-APR-2023', 500.00, 'Apple Pay', NULL, 'delivered');
+INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+VALUES (1285, 2, '01-APR-2023', 300.00, 'Apple Pay', NULL);
 
+INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no)
+VALUES (1282, 1, '01-APR-2023', 1600.00, 'Apple Pay', NULL);
+
+COMMIT;
+-- -- test for some books delievered
+-- INSERT INTO Orders (order_id, student_id, order_date, total_price, payment_method, card_no, order_delivered)
+-- VALUES (1288, 6, '17-APR-2023', 500.00, 'Apple Pay', NULL, 'pending');
+PROMPT INSERT Orders_Book TABLE;
+
+
+INSERT INTO Orders_Book VALUES (1287, 1, 1, '19-APR-2023');
+INSERT INTO Orders_Book VALUES (1287, 2, 1, '27-APR-2023');
+
+INSERT INTO Orders_Book VALUES (1286, 2, 1, '20-APR-2023');
+
+INSERT INTO Orders_Book VALUES (1920, 2, 1, '09-APR-2023');
+
+INSERT INTO Orders_Book VALUES (1285, 2, 1, '09-APR-2023');
+INSERT INTO Orders_Book VALUES (1282, 3, 4, '09-APR-2023');
 
 
 COMMIT;
 
+PROMPT INSERT Orders_Total TABLE;
+INSERT INTO Orders_Total VALUES (1287, 2, '18-APR-2023', 600.00);
+INSERT INTO Orders_Total VALUES (1286, 1, '13-APR-2023', 300.00);
+INSERT INTO Orders_Total VALUES (1920, 3, '05-APR-2023', 300.00);
+
+INSERT INTO Orders_Total VALUES (1285, 2, '01-APR-2023', 300.00);
+
+INSERT INTO Orders_Total VALUES (1282, 1, '01-APR-2023', 1600.00);
+
+INSERT INTO Orders_Total VALUES (1287, 600.00);
+
+COMMIT;
 
 -- to check again
 -- Check if there is credit card when payment option is credit card
