@@ -13,7 +13,7 @@
 
 ## About
 
-This is a **Java-based University Bookshop Database Application** developed for **`COMP2016 Database Management`** course.
+This is a **Java-based University Bookshop Database Application** developed for enhancing **`Database Management`** skills.
 
 It supports various functions such as searching for orders, updating orders, placing new orders, canceling orders, and displaying all available books and orders.
 
