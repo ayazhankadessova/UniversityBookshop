@@ -4,13 +4,6 @@
 
 `Conceptual & Logical database design`, `Oracle Database Management`, `SQL(Create/query/update relational tables)`, `PL/SQL trigger implementation`, `JDBC implementation`, `Testing`, `Teamwork`.
 
-## Group Members:
-
-- KADESSOVA Ayazhan 
-- ONG Jun Kye
-- SHAMMO Shahtiya Khan
-- LIM Jihye
-
 ## About
 
 This is a **Java-based University Bookshop Database Application** developed for enhancing **`Database Management`** skills.
@@ -86,6 +79,13 @@ To run the program, simply compile and run UniversityBookshop.java. You will be 
 9. Exit: This option allows the manager to exit the system.
 
 With these options, the University BookShop manager can effectively manage the book inventory, process orders, and provide timely and efficient service to its customers.
+
+## Collaboration:
+
+- KADESSOVA Ayazhan 
+- ONG Jun Kye
+- SHAMMO Shahtiya Khan
+- LIM Jihye
 
 ## Issues/need to check
 
