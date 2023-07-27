@@ -82,7 +82,7 @@ With these options, the University BookShop manager can effectively manage the b
 
 ## Collaboration:
 
-- KADESSOVA Ayazhan
+- KADESSOVA Ayazhan (Leader)
 - ONG Jun Kye
 - SHAMMO Shahtiya Khan
 - LIM Jihye
