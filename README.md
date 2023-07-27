@@ -26,9 +26,9 @@ _Feel free to download and use this application as a reference for your own data
 
 - Terminal:
 
-`@ ./group3_dbdrop.sql`
+`@ ./dbdrop.sql`
 
-`@ ./group3_dbinsert.sql`
+`@ ./dbinsert.sql`
 
 2. Change your login and password for Oracle Database in UniversityBookshop.java:
 
@@ -82,7 +82,7 @@ With these options, the University BookShop manager can effectively manage the b
 
 ## Collaboration:
 
-- KADESSOVA Ayazhan 
+- KADESSOVA Ayazhan
 - ONG Jun Kye
 - SHAMMO Shahtiya Khan
 - LIM Jihye
